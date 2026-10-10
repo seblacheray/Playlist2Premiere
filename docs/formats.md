@@ -1,0 +1,11 @@
+# Références et décisions de format
+
+Consultées pendant le développement :
+
+- PLS : implémentation [VLC `pls.c`](https://github.com/videolan/vlc/blob/master/modules/demux/playlist/pls.c). Section `[playlist]`, clés `FileN`, `TitleN`, `LengthN`, `NumberOfEntries`, `Version`. Le convertisseur trie les indices numériques et conserve chaque occurrence ; `LengthN`, notamment `-1`, ne constitue pas une durée fiable.
+- MPCPL : [MPC-HC `PlayerPlaylistBar.cpp`](https://github.com/clsid2/mpc-hc/blob/develop/src/mpc-hc/PlayerPlaylistBar.cpp), fonctions `ParseMPCPlayList` / `SaveMPCPlayList`. En-tête `MPCPLAYLIST`, trois champs séparés par les deux premières virgules. L’ordre des enregistrements `type` définit l’ordre des entrées. `type=0` correspond aux fichiers. Plusieurs `filename` sous un même index peuvent représenter vidéo + doublage, et ne doivent pas être pris pour deux clips ; cette variante est refusée.
+- FCP XML : [documentation Apple archivée](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/FinalCutPro_XML/Elements/Elements.html), non accessible depuis le réseau de cette session. Référence d’implémentation consultée : [adaptateur OpenTimelineIO FCP XML](https://github.com/OpenTimelineIO/otio-fcp-adapter/blob/main/src/otio_fcp_adapter/fcp_xml.py), notamment conversion `timebase`/`ntsc`.
+
+`xmeml` est distinct de FCPXML moderne. Racine version 5, une séquence, format vidéo, piste vidéo, pistes audio, éléments `clipitem`, définitions `file` identifiées et réutilisées. Les URI de médias sont construites par `Path.as_uri()` pour encoder accents, espaces, `#` et autres caractères réservés. Sur Windows, cette méthode représente les lecteurs et chemins UNC selon les règles de pathlib. Les liens clip vidéo/audio sont bidirectionnels et leurs indices reflètent leur piste réelle.
+
+La preuve actuelle est structurelle et fonctionnelle côté moteur ; aucune certification de conformité complète à la DTD ou de comportement de Premiere n’est revendiquée.
