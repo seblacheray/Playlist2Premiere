@@ -35,19 +35,29 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $base = 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-essentials_build.zip'
-          $archive = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
-          $checksum = "$archive.sha256"
-          Invoke-WebRequest $base -OutFile $archive
-          Invoke-WebRequest "$base.sha256" -OutFile $checksum
-          $expected = ((Get-Content $checksum -Raw).Trim() -split '\s+')[0]
-          if ($expected -notmatch '^[a-fA-F0-9]{64}$') { throw 'Invalid published SHA-256' }
+          # Non-shared Windows x64 build: FFprobe runs without external FFmpeg DLLs.
+          $release = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest'
+          $asset = 'ffmpeg-master-latest-win64-gpl.zip'
+          $archive = Join-Path $env:RUNNER_TEMP $asset
+          $checksum = Join-Path $env:RUNNER_TEMP 'checksums.sha256'
+          Invoke-WebRequest "$release/checksums.sha256" -OutFile $checksum
+          $pattern = '^([a-fA-F0-9]{64})\s+\*?' + [regex]::Escape($asset) + '$'
+          $checksumLines = @(Get-Content $checksum | Where-Object { $_ -match $pattern })
+          if ($checksumLines.Count -ne 1) { throw "Expected exactly one published checksum for $asset" }
+          $expected = [regex]::Match($checksumLines[0], $pattern).Groups[1].Value
+          Invoke-WebRequest "$release/$asset" -OutFile $archive
           if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $expected) { throw 'FFmpeg checksum mismatch' }
           $tools = Join-Path $env:RUNNER_TEMP 'ffmpeg-tools'
           Expand-Archive $archive -DestinationPath $tools
-          $probe = @(Get-ChildItem $tools -Filter ffprobe.exe -Recurse)
-          $ffmpeg = @(Get-ChildItem $tools -Filter ffmpeg.exe -Recurse)
+          $probe = @(Get-ChildItem $tools -Filter ffprobe.exe -Recurse -File)
+          $ffmpeg = @(Get-ChildItem $tools -Filter ffmpeg.exe -Recurse -File)
           if ($probe.Count -ne 1 -or $ffmpeg.Count -ne 1) { throw 'Expected one FFprobe and FFmpeg executable' }
+          foreach ($executable in @($probe[0].FullName, $ffmpeg[0].FullName)) {
+            if (!(Test-Path -LiteralPath $executable -PathType Leaf) -or (Get-Item -LiteralPath $executable).Length -eq 0) { throw "Missing or empty executable: $executable" }
+            & $executable -version
+            if ($LASTEXITCODE -ne 0) { throw "Downloaded executable cannot run: $executable" }
+          }
+          "FFMPEG_DOWNLOAD_URL=$release/$asset" >> $env:GITHUB_ENV
           $probe[0].DirectoryName >> $env:GITHUB_PATH
           "FFPROBE_EXE=$($probe[0].FullName)" >> $env:GITHUB_ENV
           "FFMPEG_TOOLS=$tools" >> $env:GITHUB_ENV
@@ -95,7 +105,7 @@ jobs:
           $root = (Get-Item $env:FFPROBE_EXE).Directory.Parent.FullName
           New-Item -ItemType Directory portable/ffmpeg-notices | Out-Null
           Copy-Item "$root\*" portable/ffmpeg-notices/ -Recurse -Exclude bin
-          "FFprobe: FFmpeg 7.1.1 essentials (Gyan). Archive SHA-256: $env:FFMPEG_SHA256`nSource and build information: https://www.gyan.dev/ffmpeg/builds/`nFFmpeg source: https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz`nPySide6/Qt license information: https://doc.qt.io/qtforpython-6/licenses.html" | Set-Content portable/THIRD-PARTY.txt
+          "FFprobe: BtbN standalone Windows x64 GPL build. Download: $env:FFMPEG_DOWNLOAD_URL. Archive SHA-256: $env:FFMPEG_SHA256`nSource and build information: https://github.com/BtbN/FFmpeg-Builds`nFFmpeg source: https://github.com/FFmpeg/FFmpeg`nPySide6/Qt license information: https://doc.qt.io/qtforpython-6/licenses.html" | Set-Content portable/THIRD-PARTY.txt
           Get-FileHash portable/Playlist2Premiere.exe -Algorithm SHA256 | Format-List | Out-File portable/SHA256.txt
       - uses: actions/upload-artifact@v4
         with:
