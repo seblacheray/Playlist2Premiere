@@ -71,3 +71,16 @@ python -m venv .venv
 ```
 
 Installer FFmpeg via le gestionnaire système pour l’intégration. Pour un contrôle Qt sans affichage : `QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest tests/test_gui.py -q`.
+
+## Télécharger la version portable depuis GitHub Actions
+
+Le workflow **Windows portable** s’exécute à chaque push sur `main`, pour les pull requests et manuellement via **Run workflow**. Il utilise Windows x64, Python 3.12, teste l’application avec FFmpeg/FFprobe, puis crée un exécutable PyInstaller contenant FFprobe. FFmpeg sert uniquement à générer les médias des tests : l’application n’en a pas besoin pour convertir les playlists, il n’est donc pas distribué dans l’exécutable.
+
+1. Ouvrir l’onglet **Actions** du dépôt GitHub et choisir **Windows portable**.
+2. Ouvrir une exécution réussie de la branche `main` (ou lancer **Run workflow** sur cette branche).
+3. Dans **Artifacts**, télécharger **Playlist2Premiere-Windows-x64-portable**. Une connexion GitHub peut être nécessaire.
+4. Extraire le ZIP dans un dossier, conserver les notices fournies, puis lancer **Playlist2Premiere.exe**. Python, FFmpeg et FFprobe n’ont pas à être installés.
+
+Les artefacts sont conservés 30 jours. Le téléchargement comprend le SHA-256 de l’exécutable. Ce build n’est pas signé ; Windows peut afficher une notification SmartScreen. Il ne s’agit pas d’un installeur ni d’une publication GitHub Releases.
+
+Le workflow vérifie aussi l’exécutable compilé avec un PATH limité aux dossiers Windows : démarrage Qt hors écran, sélection du FFprobe embarqué, analyse d’un média avec accents/caractères spéciaux, puis export XML avec vidéo et deux canaux audio. Ce contrôle ne remplace pas l’essai interactif sur Windows ni l’import réel dans Premiere. FFprobe est téléchargé depuis la distribution Gyan 7.1.1 et comparé à son SHA-256 publié avant utilisation ; si le téléchargement ou la vérification échoue, la compilation est bloquée.

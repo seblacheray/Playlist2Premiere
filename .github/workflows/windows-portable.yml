@@ -1,0 +1,112 @@
+name: Windows portable
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install Python dependencies
+        run: |
+          python -m pip install -e '.[dev]'
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed' }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency consistency check failed' }
+      - name: Download and verify standalone FFmpeg tools
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $base = 'https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-7.1.1-essentials_build.zip'
+          $archive = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
+          $checksum = "$archive.sha256"
+          Invoke-WebRequest $base -OutFile $archive
+          Invoke-WebRequest "$base.sha256" -OutFile $checksum
+          $expected = ((Get-Content $checksum -Raw).Trim() -split '\s+')[0]
+          if ($expected -notmatch '^[a-fA-F0-9]{64}$') { throw 'Invalid published SHA-256' }
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $expected) { throw 'FFmpeg checksum mismatch' }
+          $tools = Join-Path $env:RUNNER_TEMP 'ffmpeg-tools'
+          Expand-Archive $archive -DestinationPath $tools
+          $probe = @(Get-ChildItem $tools -Filter ffprobe.exe -Recurse)
+          $ffmpeg = @(Get-ChildItem $tools -Filter ffmpeg.exe -Recurse)
+          if ($probe.Count -ne 1 -or $ffmpeg.Count -ne 1) { throw 'Expected one FFprobe and FFmpeg executable' }
+          $probe[0].DirectoryName >> $env:GITHUB_PATH
+          "FFPROBE_EXE=$($probe[0].FullName)" >> $env:GITHUB_ENV
+          "FFMPEG_TOOLS=$tools" >> $env:GITHUB_ENV
+          "FFMPEG_SHA256=$expected" >> $env:GITHUB_ENV
+      - name: Run all tests including media integration
+        run: |
+          ffmpeg -version
+          if ($LASTEXITCODE -ne 0) { throw 'FFmpeg unavailable' }
+          ffprobe -version
+          if ($LASTEXITCODE -ne 0) { throw 'FFprobe unavailable' }
+          python -m pytest -q -rs --junitxml=test-results.xml
+          if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
+      - name: Build portable executable with embedded FFprobe
+        shell: pwsh
+        run: ./scripts/build_windows.ps1 -FFprobe $env:FFPROBE_EXE
+      - name: Smoke test frozen application without Python or FFprobe on PATH
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $media = Join-Path $env:RUNNER_TEMP 'médias & test #1'
+          New-Item -ItemType Directory -Path $media | Out-Null
+          $fixturePath = Join-Path $media 'vidéo & test.mp4'
+          ffmpeg -nostdin -v error -f lavfi -i 'color=s=160x90:r=30000/1001' -f lavfi -i 'sine=sample_rate=48000' -t 1 -c:v libx264 -c:a aac -ac 2 -shortest $fixturePath
+          if ($LASTEXITCODE -ne 0) { throw 'Fixture generation failed' }
+          $result = Join-Path $media 'result.xml'
+          $exe = (Resolve-Path dist/Playlist2Premiere.exe).Path
+          $oldPath = $env:PATH
+          try {
+            $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+            $process = Start-Process -FilePath $exe -ArgumentList @('--packaging-smoke-test', "`"$fixturePath`"", "`"$result`"") -PassThru
+            if (!$process.WaitForExit(120000)) { $process.Kill(); throw 'Frozen application timed out' }
+            if ($process.ExitCode -ne 0) { throw "Frozen application failed: $($process.ExitCode)" }
+          } finally { $env:PATH = $oldPath }
+          [xml]$xml = Get-Content -LiteralPath $result -Raw
+          if (@($xml.xmeml.sequence.media.video.track.clipitem).Count -ne 1) { throw 'Missing video clip' }
+          if (@($xml.xmeml.sequence.media.audio.track).Count -ne 2) { throw 'Missing stereo audio' }
+      - name: Prepare portable download and notices
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory portable | Out-Null
+          Copy-Item dist/Playlist2Premiere.exe portable/
+          Copy-Item README.md portable/
+          Copy-Item docs/premiere-validation.md portable/
+          # Retain the distributor's licenses/notices alongside the executable.
+          $root = (Get-Item $env:FFPROBE_EXE).Directory.Parent.FullName
+          New-Item -ItemType Directory portable/ffmpeg-notices | Out-Null
+          Copy-Item "$root\*" portable/ffmpeg-notices/ -Recurse -Exclude bin
+          "FFprobe: FFmpeg 7.1.1 essentials (Gyan). Archive SHA-256: $env:FFMPEG_SHA256`nSource and build information: https://www.gyan.dev/ffmpeg/builds/`nFFmpeg source: https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz`nPySide6/Qt license information: https://doc.qt.io/qtforpython-6/licenses.html" | Set-Content portable/THIRD-PARTY.txt
+          Get-FileHash portable/Playlist2Premiere.exe -Algorithm SHA256 | Format-List | Out-File portable/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Playlist2Premiere-Windows-x64-portable
+          path: portable/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-test-results
+          path: test-results.xml
+          if-no-files-found: ignore
