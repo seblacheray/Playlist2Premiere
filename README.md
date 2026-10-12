@@ -83,7 +83,7 @@ Le workflow **Windows portable** s’exécute à chaque push sur `main`, pour le
 
 Les artefacts sont conservés 30 jours. Le téléchargement comprend le SHA-256 de l’exécutable. Ce build n’est pas signé ; Windows peut afficher une notification SmartScreen. Il ne s’agit pas d’un installeur ni d’une publication GitHub Releases.
 
-Le workflow vérifie aussi l’exécutable compilé avec un PATH limité aux dossiers Windows : démarrage Qt hors écran, sélection du FFprobe embarqué, analyse d’un média avec accents/caractères spéciaux, puis export XML avec vidéo et deux canaux audio. Ce contrôle ne remplace pas l’essai interactif sur Windows ni l’import réel dans Premiere. FFprobe est téléchargé depuis les releases GitHub de BtbN/FFmpeg-Builds (archive Windows x64 GPL non partagée) et comparé à la ligne correspondante du manifeste `checksums.sha256` publié avant utilisation ; si le téléchargement ou la vérification échoue, la compilation est bloquée.
+Le workflow vérifie aussi l’exécutable compilé avec un PATH limité aux dossiers Windows : démarrage Qt hors écran, sélection du FFprobe embarqué, analyse d’un média avec accents/caractères spéciaux, puis export XML avec vidéo et deux canaux audio. Ce contrôle ne remplace pas l’essai interactif sur Windows ni l’import réel dans Premiere. FFprobe est téléchargé depuis une release datée de BtbN/FFmpeg-Builds (archive Windows x64 GPL non partagée) et vérifié avec les SHA-256 figés de l’archive et du binaire dans `.github/ffprobe-lock.json` ; si le téléchargement ou la vérification échoue, la compilation est bloquée.
 
 
 ## Licence
@@ -91,3 +91,5 @@ Le workflow vérifie aussi l’exécutable compilé avec un PATH limité aux dos
 Copyright (C) 2026 Seb Lacheray. Le code de Playlist2Premiere est distribué sous **GNU GPL-3.0-or-later** : vous pouvez l’utiliser, le modifier et le redistribuer selon la GPL version 3 ou toute version ultérieure. Les versions dérivées redistribuées doivent respecter ses obligations, notamment la fourniture du code source correspondant. Le logiciel est fourni sans garantie, dans les limites prévues par la licence.
 
 Voir [LICENSE](LICENSE), les [notices tierces](THIRD-PARTY.md) et la [revue de distribution Windows](docs/license-compliance.md). Les composants tiers conservent leurs propres droits et licences. La distribution du ZIP portable est désormais conditionnée à la fourniture et à la revue de sources correspondantes ; une compilation réussie ne certifie pas sa conformité juridique.
+
+La distribution portable reste bloquée tant que la provenance des sources de toutes les dépendances statiques de FFprobe n’est pas établie, même avec une confirmation manuelle. Voir [la traçabilité FFprobe](docs/ffprobe-traceability.md).

@@ -1,0 +1,569 @@
+[
+  {
+    "recipe": "scripts.d/10-mingw-std-threads.sh",
+    "recipe_sha256": "44b29b0a71465615b40deeb9cd853039234868699cf4c6b85453560aba8dc212",
+    "declared_source_url": "https://github.com/meganz/mingw-std-threads.git",
+    "declared_revision": "c931bac289dd431f1dd30fc4a5d1a7be36668073",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/10-mingw.sh",
+    "recipe_sha256": "e2385614af0b2a4fd9393f318c9463d585d33ced403140f49e18165fd60d71fc",
+    "declared_source_url": "https://git.code.sf.net/p/mingw-w64/mingw-w64.git",
+    "declared_revision": "57b595039040eaa15bece85b7cc71d952281b269",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/10-xorg-macros.sh",
+    "recipe_sha256": "933dd1096b6b9f1b32fcc7d172a528df316cf0119ce0abc6f121d0501566436e",
+    "declared_source_url": "https://gitlab.freedesktop.org/xorg/util/macros.git",
+    "declared_revision": "ea1e15a4909ac8b03b2c5a08ac3810b385985157",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/15-base.sh",
+    "recipe_sha256": "2e418d514d75752ef44ad4e44ddb469e21037f752cf207b8c60d613c6834de47",
+    "declared_source_url": null,
+    "declared_revision": null,
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/20-libiconv.sh",
+    "recipe_sha256": "b473cb6160679b422e6fa79e43f61ea09692e0926208a463bdd52babea2561e9",
+    "declared_source_url": "https://git.savannah.gnu.org/git/libiconv.git",
+    "declared_revision": "1df3087ba8110c7f3ed3eb5f8869b814dbbe00b0",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/20-zlib.sh",
+    "recipe_sha256": "81dcdb6c62de9190d65659316ee93b4167e5fb298bac9c396b4d0e2f63feeea0",
+    "declared_source_url": "https://github.com/madler/zlib.git",
+    "declared_revision": "767c4c947852e143f582c85f14cf573411df1b35",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-fftw3.sh",
+    "recipe_sha256": "0807086b7235186b580d18eb644292af47d139e917c2a56bb71d2bba5d0ceaf0",
+    "declared_source_url": "https://github.com/FFTW/fftw3.git",
+    "declared_revision": "93ed4c786934aec9946f8dda4b4e3eb08f8be41c",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-fribidi.sh",
+    "recipe_sha256": "8c49596458e13a33ffd24dccf93fcb17304b8b0929e5a1457fab55ba9e26c1cd",
+    "declared_source_url": "https://github.com/fribidi/fribidi.git",
+    "declared_revision": "4c914a92e94a9fe4f30ae83a1130099841566448",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-gmp.sh",
+    "recipe_sha256": "a2cda3073037327150433491b49e47dec51a1c0f388c17ebf0729800a29c29f9",
+    "declared_source_url": "https://github.com/BtbN/gmplib.git",
+    "declared_revision": "763b40df71c0f4d5f5d7b33dc55038c8c9377ecf",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-libogg.sh",
+    "recipe_sha256": "f72086b3d86824174bacb8ee4fd4f966c9e13fd8a8242821f429252c77b6e585",
+    "declared_source_url": "https://github.com/xiph/ogg.git",
+    "declared_revision": "06a5e0262cdc28aa4ae6797627a783b5010440f0",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-libpng.sh",
+    "recipe_sha256": "76c8781840bf7e6c8494b2c73ae8281522ae4393208177a46d3c9da551f41e3f",
+    "declared_source_url": "https://github.com/glennrp/libpng.git",
+    "declared_revision": "964b4135949703b705fc760fc3fb546b86e5ab47",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-libxml2.sh",
+    "recipe_sha256": "ea2c9ccf748f3c3f7fd3e6391b58db5826918f48cb56511772f972eb2f5d3243",
+    "declared_source_url": "https://github.com/GNOME/libxml2.git",
+    "declared_revision": "91586dc6742ab335682235120363f6e126eea5e2",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-openssl.sh",
+    "recipe_sha256": "3f3c98c999d7069a98f311a9bfca1a39215fd54a6db447cb362ccfbfe1c41f7c",
+    "declared_source_url": "https://github.com/openssl/openssl.git",
+    "declared_revision": "openssl-3.6.4",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/25-xz.sh",
+    "recipe_sha256": "d1a2b40d4f446809827ef03f06a2a34817af7af3dcbce6f5afb580b3df1c55fd",
+    "declared_source_url": "https://github.com/tukaani-project/xz.git",
+    "declared_revision": "3b1efb04d17c3a9ef7f473d73af13f1531428ffe",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-brotli.sh",
+    "recipe_sha256": "1bedcbd813c9bc6e73653b256932f51a6e25f04b937060665107c02205507e05",
+    "declared_source_url": "https://github.com/google/brotli.git",
+    "declared_revision": "a3abcbee0d945e51dddeec81e647ffe0cde182c2",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-lcms2.sh",
+    "recipe_sha256": "da662f8712aef2e6bc4f5e8bbdabf241c041abadfac76f6471f53d65ecbb25bc",
+    "declared_source_url": "https://github.com/mm2/Little-CMS.git",
+    "declared_revision": "35cef8775e0ab46f0dda0b46aae1e69d27524432",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-libffi.sh",
+    "recipe_sha256": "5fc711e7944537d0255c1a059f3d7cc8dea58f9b17331e8e62a4c1ee6f9a459a",
+    "declared_source_url": "https://github.com/libffi/libffi.git",
+    "declared_revision": "bc553867367246d140cd156f060bd0409f57f157",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-libsamplerate.sh",
+    "recipe_sha256": "628de3f8d1f8f71a375bf743f103e5583802f946cf82a2d1474e125f6891dc1f",
+    "declared_source_url": "https://github.com/libsndfile/libsamplerate.git",
+    "declared_revision": "0844c208f683527c08ea8a80acc13b398aa9c8bf",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-libudfread.sh",
+    "recipe_sha256": "55d2af80b7dda6b8fbca52e2cc8262791b1ffdb09ef6a990117b93c11b1f2339",
+    "declared_source_url": "https://code.videolan.org/videolan/libudfread.git",
+    "declared_revision": "b0bc6957e7e07d5f35391f210596d9eb71cffdd9",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-libunibreak.sh",
+    "recipe_sha256": "6fa03018e8c5e462424673340734e20a36b9efef3b3083b5ddebd072502cc79f",
+    "declared_source_url": "https://github.com/adah1972/libunibreak.git",
+    "declared_revision": "28a2756b864c343f438cd22537d49d394d4666a5",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-libvorbis.sh",
+    "recipe_sha256": "96a4e7735c0d442d62a4859d8e46db735b57c09d5a4440361e35d064e1220a90",
+    "declared_source_url": "https://github.com/xiph/vorbis.git",
+    "declared_revision": "1b75110b5a2754ba1931d82dd83cb822b266a21d",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-opencl.sh",
+    "recipe_sha256": "4b1dceba0208348a4a38f011a9b779b8a728dc13303773d19c31b389ef57294b",
+    "declared_source_url": "https://github.com/KhronosGroup/OpenCL-Headers.git",
+    "declared_revision": "e6060189f4ebe8b52d885c37af71b9a50c272154",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-pcre2.sh",
+    "recipe_sha256": "de90058846290e156f8fc303464111ff97c3fc48749ee0fa6e2f1ebcd5924324",
+    "declared_source_url": "https://github.com/PCRE2Project/pcre2.git",
+    "declared_revision": "09eb19dc1102b34e7557408f33318364cb97d2b0",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-pixman.sh",
+    "recipe_sha256": "565b6f1b8e109cdf99d8186af6bdfe5f7df1331504918960f797854bf9d53363",
+    "declared_source_url": "https://gitlab.freedesktop.org/pixman/pixman.git",
+    "declared_revision": "96c04d1b87934dc4b9396197a2dff737698ab310",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-pulseaudio.sh",
+    "recipe_sha256": "0f04e9090dacea4eefd77e97622645eda80f51118c58489551812252d1e8e597",
+    "declared_source_url": "https://gitlab.freedesktop.org/pulseaudio/pulseaudio.git",
+    "declared_revision": "77d25a1e613095bdf87a1d13b65e7c330565077a",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-vmaf.sh",
+    "recipe_sha256": "0bd50c0e08e35b9a8326904f51e8f44468abd78e5fc3da6ee4a3e91d788e5e4d",
+    "declared_source_url": "https://github.com/Netflix/vmaf.git",
+    "declared_revision": "86da14d0306a138fd3f01319860b905169746516",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-xxhash.sh",
+    "recipe_sha256": "bc856e2d5c4bd8e584d56b87700c648d300d2a071f75de20194e5382a45a1ade",
+    "declared_source_url": "https://github.com/Cyan4973/xxHash.git",
+    "declared_revision": "680bf463fa1ca0461b9a7c2dab7556e1f54cf4cf",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/45-zstd.sh",
+    "recipe_sha256": "1d3d0fe2f66c556d69e27527b96dd666f76e1f8c6b91bddc2f5548914dd26f74",
+    "declared_source_url": "https://github.com/facebook/zstd.git",
+    "declared_revision": "01b7154f1172432f8abe9b3bb9909e14a1176b7d",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-amf.sh",
+    "recipe_sha256": "54f6103e4dcca2d2b22b8248716fd774c981ce6ee2b3394e9ed07e629d82b30b",
+    "declared_source_url": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git",
+    "declared_revision": "6277e353fd625121a8f627b1d0540323ef372a49",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-aom.sh",
+    "recipe_sha256": "3f72c32a7d72a7dd10c1cda6702ddad6e0008a886cdd44113cf96108d7b20368",
+    "declared_source_url": "https://aomedia.googlesource.com/aom",
+    "declared_revision": "b4ce2cd097b00921b0327bfb5f07b5f8361ade99",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-avisynth.sh",
+    "recipe_sha256": "dd5685dbb9be432e764380a8ac1ca88c829baa77fcaacf10932040ec44439d0a",
+    "declared_source_url": "https://github.com/AviSynth/AviSynthPlus.git",
+    "declared_revision": "5c82777b374bdef16e13007a11e77d735ac1e4eb",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-chromaprint.sh",
+    "recipe_sha256": "18f0d650b2f6442f374dd8b1a2fa000a15ab88ecbf021a0a3f5a32750c0992b6",
+    "declared_source_url": "https://github.com/acoustid/chromaprint.git",
+    "declared_revision": "aed8eba2202dd9d7b3b0a56c77904cc805490d72",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-dav1d.sh",
+    "recipe_sha256": "ab393955968f5364e4e2e67adfb9aedae2f95120f2e199488bcbc147201e09e2",
+    "declared_source_url": "https://code.videolan.org/videolan/dav1d.git",
+    "declared_revision": "9711965b60bb692ae24004659acf61f5c7d9ed61",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-davs2.sh",
+    "recipe_sha256": "dff0e5e8bf46f349f2ac92bb097122114c4e4c56b4b1b363891a1c81e154bb1e",
+    "declared_source_url": "https://github.com/pkuvcl/davs2.git",
+    "declared_revision": "b41cf117452e2d73d827f02d3e30aa20f1c721ac",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-fdk-aac.sh",
+    "recipe_sha256": "8dd0296be21cf405b8f302bc13e880c647c1647407d44683971675cb2a692c60",
+    "declared_source_url": "https://github.com/mstorsjo/fdk-aac.git",
+    "declared_revision": "7c83d08002332b2730c845eec3497e6bf585dd28",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-ffnvcodec.sh",
+    "recipe_sha256": "d3e4c922288a83e4cc7dc6dfb06c84fdb164d8515f9cdfab18e6bdfc3855f2e3",
+    "declared_source_url": "https://github.com/FFmpeg/nv-codec-headers.git",
+    "declared_revision": "eddcea9e27f6b772057c9b3f87de2cc1737faffc",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-frei0r.sh",
+    "recipe_sha256": "da65c7904e078d5cc22fd8dd0311e1a1e5401b3b0c18e9f35de96a55e0fb235b",
+    "declared_source_url": "https://github.com/dyne/frei0r.git",
+    "declared_revision": "4c95b2a02b2d03c71d5f6d7980d16c99acfd5a5f",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-gme.sh",
+    "recipe_sha256": "a98435e63c57e920be8d90e1c07d215352f9a97639a44696cf8de7120a41b7db",
+    "declared_source_url": "https://github.com/libgme/game-music-emu.git",
+    "declared_revision": "f68963b1de0633149b05732113d3c3113c6f63a1",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-kvazaar.sh",
+    "recipe_sha256": "e1eba6170c3fb3f6d676b6d306fb503064a7c71e1038f5f09811276a76e08f3e",
+    "declared_source_url": "https://github.com/ultravideo/kvazaar.git",
+    "declared_revision": "2b06691bb5844404c0e703f12a5d7b0fee914ec7",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-lcevcdec.sh",
+    "recipe_sha256": "7990627bf8194f34c0e8a6aac0b00a919a7d8b7099ffa07b5304b13383d7c44d",
+    "declared_source_url": "https://github.com/v-novaltd/LCEVCdec.git",
+    "declared_revision": "17804ac54db8fbb42717f3275b1e73f3c0b067d3",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libaribb24.sh",
+    "recipe_sha256": "819af96814ebaf3612d3e50367e47d892848b22d0a71befe06b481902b9e957b",
+    "declared_source_url": "https://github.com/nkoriyama/aribb24.git",
+    "declared_revision": "5e9be272f96e00f15a2f3c5f8ba7e124862aec38",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libaribcaption.sh",
+    "recipe_sha256": "bdc45a086a105d789ef80da7c0eed9bc70e76c15bcb7fb5ef5376bfb18249f6c",
+    "declared_source_url": "https://github.com/xqq/libaribcaption.git",
+    "declared_revision": "c64c23b8905ba514b87c9789269e9f66f949ffe0",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libass.sh",
+    "recipe_sha256": "e6419cade66532faefe04c652526bafe945963e16552ad4d976dd33f9b13490d",
+    "declared_source_url": "https://github.com/libass/libass.git",
+    "declared_revision": "f61db567e6593df3470e91594bcd4ad2d0473aff",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libbluray.sh",
+    "recipe_sha256": "cf610f2531dc559f63857a9c4544658ad464321723236417ba550cf64a2debcf",
+    "declared_source_url": "https://code.videolan.org/videolan/libbluray.git",
+    "declared_revision": "a24f4fad4d62893de647abc8671397747b2359dd",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libmp3lame.sh",
+    "recipe_sha256": "a524cd3b9a40444fb554164f5a5dd466ca616ad2cf6756c28164787e012d982f",
+    "declared_source_url": "https://svn.code.sf.net/p/lame/svn/trunk/lame",
+    "declared_revision": null,
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libopus.sh",
+    "recipe_sha256": "098f4436197ad0502b13ffd211347b03ec575c1ab36a02cecff431d68cd6aeb4",
+    "declared_source_url": "https://github.com/xiph/opus.git",
+    "declared_revision": "503d81b138d76621aae4b12786e90de48aa8db3a",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libplacebo.sh",
+    "recipe_sha256": "7f6f86a2818a1c0dec2248adc794198089bdee603c24b137eff4454c5aa82778",
+    "declared_source_url": "https://code.videolan.org/videolan/libplacebo.git",
+    "declared_revision": "1937beef3a2f508266c68efea1491e3fc4600e04",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libssh.sh",
+    "recipe_sha256": "508dd2a6fbd0a18b201e9364ba6f82524b36ce06976c258c1476d9c7f4b7c973",
+    "declared_source_url": "https://gitlab.com/libssh/libssh-mirror.git",
+    "declared_revision": "76e0a8639e61436c28d877586f65a7707edc6ee5",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libtheora.sh",
+    "recipe_sha256": "cd093a82eb271d465092c498567cdbef724dbf99165dda1fec0179ce5a60c089",
+    "declared_source_url": "https://github.com/xiph/theora.git",
+    "declared_revision": "28fd5ec77f0ad0e07a371cef1047828116f6bd8a",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libvpx.sh",
+    "recipe_sha256": "ee1f76e2ab8c9b40076b554fd3e378a4e5136cf54da6af8642d5539f2d949760",
+    "declared_source_url": "https://chromium.googlesource.com/webm/libvpx",
+    "declared_revision": "5e680f30801d03c21078f8c4b772464752516211",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libwebp.sh",
+    "recipe_sha256": "98f5850fc66c7ea510991cd7b088a314163cf3faa58ab0880b5ed93a065865d3",
+    "declared_source_url": "https://chromium.googlesource.com/webm/libwebp",
+    "declared_revision": "5c168cd23b1872969c38e34b01b04dcf29849288",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-libzmq.sh",
+    "recipe_sha256": "6d664155f794f62f7069385f26bbf2bc725ba648e5c4becef5648b48c0203e8a",
+    "declared_source_url": "https://github.com/zeromq/libzmq.git",
+    "declared_revision": "46493370217ac135246617fa2f6ac819d8b61bfc",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-onevpl.sh",
+    "recipe_sha256": "46cf258ffa89c85f146419874eb425504cce7b17fd1976dd6ac0115e6e31b12e",
+    "declared_source_url": "https://github.com/intel/libvpl.git",
+    "declared_revision": "674d015bcb294bc39fa276e99a652ea045423e82",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-openal.sh",
+    "recipe_sha256": "ae20aff1759411ebf19f178c599c4aa44a4bc69f78ec62614037c0db055de798",
+    "declared_source_url": "https://github.com/kcat/openal-soft.git",
+    "declared_revision": "c89b8cf7bba4822f230c69f0a6696a52e5322dca",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-openapv.sh",
+    "recipe_sha256": "196330e1aea843cf2073bd49301da3dc1399895376f65b403bd05db0634654c9",
+    "declared_source_url": "https://github.com/AcademySoftwareFoundation/openapv.git",
+    "declared_revision": "a58ce739be0dfb083643d929aee8f0e0ba9bdf63",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-opencore-amr.sh",
+    "recipe_sha256": "574666d18051057ca5bb5064e034332dfd0fc9d9575a41a17d7b079ff3154d00",
+    "declared_source_url": "https://git.code.sf.net/p/opencore-amr/code",
+    "declared_revision": "7dba8c32238418ce0b316a852b2224df586ca896",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-openh264.sh",
+    "recipe_sha256": "db1ebae112ff1ab962af0228907592acc80b8dbcf3561051a37c1678f1bd04f4",
+    "declared_source_url": "https://github.com/cisco/openh264.git",
+    "declared_revision": "8b2d28faade10d74d99ac80e199aef664c9c5a3b",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-openjpeg.sh",
+    "recipe_sha256": "d901cd8495f1a6d67a93c3aca6cba02373a0147cd65fd3a21a05ca2b368138b1",
+    "declared_source_url": "https://github.com/uclouvain/openjpeg.git",
+    "declared_revision": "8314119b067c0fc77834731168daaebd379fdb12",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-openmpt.sh",
+    "recipe_sha256": "cb313f9a4b9b6613ad30d82b5db00b5fe6fceae8c75578fbb334cf3898aae035",
+    "declared_source_url": "https://github.com/OpenMPT/openmpt.git",
+    "declared_revision": "f83cedb0cd5446e4dfaa83ac97e3087107e26767",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-rav1e.sh",
+    "recipe_sha256": "a3a92819459530d94e97423b94560d2ea58fb06b1a944c8124f4f0c46eaaa421",
+    "declared_source_url": "https://github.com/xiph/rav1e.git",
+    "declared_revision": "31435de9d76fddd38f6dcc31d4014574cebb2092",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-rubberband.sh",
+    "recipe_sha256": "18ed41389704bf882ae6e6c532ec6d622e609a82261e20ebe35209f339fcb8ba",
+    "declared_source_url": "https://github.com/breakfastquay/rubberband.git",
+    "declared_revision": "e4296ac80b1170018a110bc326fd0d45a0eb27d6",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-schannel.sh",
+    "recipe_sha256": "1a815e5fd18665cd59ef40789cc24212c4663e6b09dac8a685272790b0ed2945",
+    "declared_source_url": null,
+    "declared_revision": null,
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-sdl.sh",
+    "recipe_sha256": "82f547842ef8c456e54f1397f006373f138439fa39232154b71847e4bed65070",
+    "declared_source_url": "https://github.com/libsdl-org/SDL.git",
+    "declared_revision": "b90ac95029d801c5abc59472ba8e2200dff31e1e",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-snappy.sh",
+    "recipe_sha256": "86a6e62bec3f4f7b308b6807e4e7b6c626be12f15ffe96025b7d5f6fb4ee2059",
+    "declared_source_url": "https://github.com/google/snappy.git",
+    "declared_revision": "9c28114a38866f6deeaa826db918293bc28ae410",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-soxr.sh",
+    "recipe_sha256": "333ca3a3331c67fc9468ca81affdbae90385b138a9e91f5b3ad2122f42a8f0f9",
+    "declared_source_url": "https://git.code.sf.net/p/soxr/code",
+    "declared_revision": "945b592b70470e29f917f4de89b4281fbbd540c0",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-srt.sh",
+    "recipe_sha256": "da7eaf285c7ee0521d9e39145dc29dff9c024c6842dcaab15d94ce01729a6bea",
+    "declared_source_url": "https://github.com/Haivision/srt.git",
+    "declared_revision": "ff8ab25c57aece5b7351defe36dacc94fc28527f",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-svtav1.sh",
+    "recipe_sha256": "9b07a09cb92d8d0f5a99e9e6800203eaab212e55f283bc78fd3f0c76066d0fe9",
+    "declared_source_url": "https://gitlab.com/AOMediaCodec/SVT-AV1.git",
+    "declared_revision": "5ed9ffbcb5086da23f30fe9bc5b00145358462da",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-twolame.sh",
+    "recipe_sha256": "ac47c5d2b47a0faf34bf2e032db75754c6d9ed6cce7c3f69f8ed64a7e95698d3",
+    "declared_source_url": "https://github.com/njh/twolame.git",
+    "declared_revision": "6fced852d4d5cfad58cf9dbe3ea619b08e87d398",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-uavs3d.sh",
+    "recipe_sha256": "3cde849cac8a4fe08df4951840bd40c27592c82e665065f1b7fd506bef71868e",
+    "declared_source_url": "https://github.com/uavs3/uavs3d.git",
+    "declared_revision": "0e20d2c291853f196c68922a264bcd8471d75b68",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-vapoursynth.sh",
+    "recipe_sha256": "b6f3714d9e7192ff031a3834f4a3a0cc90c7c16dd1966b59a898679aec015955",
+    "declared_source_url": "https://github.com/vapoursynth/vapoursynth.git",
+    "declared_revision": "R80",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-vidstab.sh",
+    "recipe_sha256": "d857de89e32b1bb71b3c4f6034ee165414a8c645f0c585edbeb77cb63d792c96",
+    "declared_source_url": "https://github.com/georgmartius/vid.stab.git",
+    "declared_revision": "e2445c4081658318223762a696eb1c645c2d7168",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-vvenc.sh",
+    "recipe_sha256": "d020ea668a258fc7e512093dfb71c36c7f69d77817e22181ec5c8be04bc00a00",
+    "declared_source_url": "https://github.com/fraunhoferhhi/vvenc.git",
+    "declared_revision": "b1cfb2ad495af6ae4cc214b7a060e8b4166c4629",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-whisper.sh",
+    "recipe_sha256": "9f201ce8e06f46d2850214e3fc6cbfd3a003c8553a9e2d1e0019fc826f4e8cf4",
+    "declared_source_url": "https://github.com/ggml-org/whisper.cpp.git",
+    "declared_revision": "a44e07845931421bb6f3447ce0010ed9dc76a118",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-x264.sh",
+    "recipe_sha256": "37b598e715823c03347bd3ba782f829bf5e289c47cf350eae8042c2263dabfaa",
+    "declared_source_url": "https://code.videolan.org/videolan/x264.git",
+    "declared_revision": "0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-x265.sh",
+    "recipe_sha256": "8e596eb3b1ceada9a4449fd2e2f5e3883ff44b949b98c580c2fdab68f3e9739d",
+    "declared_source_url": "https://github.com/Multicorewareinc/x265.git",
+    "declared_revision": "020d7054dbecfd3be8e62efe33ff8a305d41856e",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-xavs2.sh",
+    "recipe_sha256": "aec8c0ded25b8a6116e6cfddaec86591cca268b376554efd8bd44842c6e0fc80",
+    "declared_source_url": "https://github.com/pkuvcl/xavs2.git",
+    "declared_revision": "eae1e8b9d12468059bdd7dee893508e470fa83d8",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-xvid.sh",
+    "recipe_sha256": "b138072e0e59e7aa6df2f0fdc1d2aacf9776eb3631681516815f7ba4e6997bd8",
+    "declared_source_url": "https://svn.xvid.org/trunk/xvidcore",
+    "declared_revision": null,
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-zimg.sh",
+    "recipe_sha256": "fe5d823c95d90ca14a5e44fe7b83800661d9c44aea6ba87431c4f9238204f407",
+    "declared_source_url": "https://github.com/sekrit-twc/zimg.git",
+    "declared_revision": "67e0603271c080e22c8429856dd4a8a56587e61e",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/50-zvbi.sh",
+    "recipe_sha256": "9485f71ed9884e3d0e5f6187195bc14910e6dddcf8b63a3914f1d6fb8b7a5558",
+    "declared_source_url": "https://github.com/zapping-vbi/zvbi",
+    "declared_revision": "d3a5ee9f2b047bf16cd1ee5ccf6ec05ee75409d0",
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/55-rustdedup.sh",
+    "recipe_sha256": "48d9367d97c79b176e3c176b69f69d65f1a665f0942b7372d74b39d8b9a3377c",
+    "declared_source_url": null,
+    "declared_revision": null,
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  },
+  {
+    "recipe": "scripts.d/zz-final.sh",
+    "recipe_sha256": "c332bf3fb7503c78211557149c01fd7880fd9011486fd6c33c8b1d428ab40a68",
+    "declared_source_url": null,
+    "declared_revision": null,
+    "status": "Recipe candidate only; actual FFprobe linkage and transitive inputs unverified"
+  }
+]

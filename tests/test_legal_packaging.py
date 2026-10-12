@@ -94,7 +94,7 @@ def test_incomplete_or_unsafe_sources_rejected(tmp_path, change):
         sources.assemble(path, tmp_path / 'out.zip')
 
 
-def test_source_version_and_revision_verification(tmp_path):
+def test_source_version_and_revision_verification(tmp_path, monkeypatch):
     manifest = manifest_fixture(tmp_path)
     by_id = {record['id']: record for record in manifest['components']}
     by_id['ffmpeg']['version'] = 'N-1-gaaaaaaaaaa-20261012'
@@ -107,7 +107,21 @@ def test_source_version_and_revision_verification(tmp_path):
     (tmp_path / 'installed-packages.json').write_text(json.dumps([{'name': 'pyinstaller', 'version': '1'}]))
     (tmp_path / 'build-provenance.json').write_text(json.dumps({'python_version': '1'}))
     (tmp_path / 'ffprobe-configuration.txt').write_text('ffprobe version N-1-gaaaaaaaaaa-20261012\nconfiguration: --enable-gpl --enable-version3')
+    pinned = tmp_path / 'ffprobe-pinned'
+    pinned.mkdir()
+    lock = {'ffmpeg_revision': 'a' * 40, 'btbn_release_tag_revision': 'a' * 40,
+            'ffprobe_sha256': 'd' * 64, 'source_correspondence_verified': True, 'source_archives': []}
+    by_id['ffmpeg']['binary_sha256'] = 'd' * 64
+    (tmp_path / 'SOURCE-MANIFEST.json').write_text(json.dumps(manifest))
+    archive.unlink()
+    sources.assemble(tmp_path / 'SOURCE-MANIFEST.json', archive)
+    (pinned / 'ffprobe-lock.json').write_text(json.dumps(lock))
+    monkeypatch.setattr(sources, 'FFPROBE_LOCK_PATH', pinned / 'ffprobe-lock.json')
     sources.verify(archive, tmp_path)
+    lock['source_correspondence_verified'] = False
+    (pinned / 'ffprobe-lock.json').write_text(json.dumps(lock))
+    with pytest.raises(ValueError, match='distribution blocked'):
+        sources.verify(archive, tmp_path)
     assert (tmp_path / 'source-verification.json').is_file()
     (tmp_path / 'ffprobe-configuration.txt').write_text('ffprobe version N-1-gbbbbbbbbbb-20261012')
     with pytest.raises(ValueError, match='version mismatch'):
@@ -140,3 +154,58 @@ def test_qt_collector_requires_open_source_texts(tmp_path, monkeypatch, gpl_avai
         assert all(any('GPL-3.0-only.txt' in path for path in entry['notices']) for entry in report['sources'])
         assert any('qt_attribution.json' in path for path in report['sources'][0]['notices'])
         assert (tmp_path / 'QT-LICENSING.txt').is_file()
+
+
+def test_ffprobe_lock_is_pinned_and_still_blocks_distribution():
+    lock = json.loads((SCRIPTS.parent / '.github/ffprobe-lock.json').read_text())
+    assert '/latest/' not in lock['archive_url']
+    assert lock['release_tag'] in lock['archive_url']
+    assert len(lock['archive_sha256']) == len(lock['ffprobe_sha256']) == 64
+    assert len(lock['ffmpeg_revision']) == len(lock['btbn_release_tag_revision']) == 40
+    assert '--enable-gpl' in lock['ffprobe_configuration']
+    assert '--enable-version3' in lock['ffprobe_configuration']
+    assert '--enable-nonfree' not in lock['ffprobe_configuration']
+    assert hashlib.sha256(lock['ffprobe_configuration'].encode()).hexdigest() == lock['ffprobe_configuration_sha256']
+    assert lock['source_correspondence_verified'] is False
+    assert len(lock['distribution_blockers']) > 0
+
+
+def test_locked_download_rejects_substitution(tmp_path, monkeypatch):
+    import io
+    fetcher = load('fetch_ffprobe')
+    monkeypatch.setattr(fetcher.urllib.request, 'urlopen', lambda *args, **kwargs: io.BytesIO(b'actual bytes'))
+    target = tmp_path / 'data.zip'
+    with pytest.raises(ValueError, match='checksum mismatch'):
+        fetcher.download_checked('https://example.invalid/pinned.zip', '0' * 64, target)
+    with pytest.raises(ValueError, match='never latest'):
+        fetcher.download_checked('https://example.invalid/latest/data.zip', '0' * 64, target)
+    target.unlink()
+    fetcher.download_checked('https://example.invalid/pinned.zip', hashlib.sha256(b'actual bytes').hexdigest(), target)
+    assert target.read_bytes() == b'actual bytes'
+
+
+@pytest.mark.parametrize('name', ['../escape', '/absolute', 'C:/drive', 'dir\\escape'])
+def test_locked_archive_paths_cannot_escape(name):
+    with pytest.raises(ValueError):
+        load('fetch_ffprobe').safe_member(name)
+
+
+def test_final_executable_must_embed_exact_locked_ffprobe(tmp_path, monkeypatch):
+    import PyInstaller.archive.readers
+    legal = load('package_legal')
+    payload = b'Fixture bytes, not a real binary'
+    path = tmp_path / 'lock.json'
+    path.write_text(json.dumps({'ffprobe_sha256': hashlib.sha256(payload).hexdigest(), 'ffprobe_version': 'fixture'}))
+    monkeypatch.setattr(legal, 'FFPROBE_LOCK_PATH', path)
+    class Reader:
+        toc = {'ffprobe.exe': None}
+        def __init__(self, name):
+            pass
+        def extract(self, name):
+            return payload
+    monkeypatch.setattr(PyInstaller.archive.readers, 'CArchiveReader', Reader)
+    legal.verify_embedded_ffprobe('fake.exe', tmp_path)
+    assert json.loads((tmp_path / 'embedded-ffprobe-verification.json').read_text())['sha256'] == hashlib.sha256(payload).hexdigest()
+    path.write_text(json.dumps({'ffprobe_sha256': '0' * 64, 'ffprobe_version': 'fixture'}))
+    with pytest.raises(RuntimeError, match='differs from pinned'):
+        legal.verify_embedded_ffprobe('fake.exe', tmp_path)

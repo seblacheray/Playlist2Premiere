@@ -33,7 +33,7 @@ The reviewer must inspect the frozen inventory, ensure collected license texts c
 
 No exact historical artifact inspection, no independent validation of corresponding-source completeness, no native Windows build in this environment, and no legal compliance certification. Metadata license labels do not replace full texts. Onefile embedding does not remove GPL obligations. The owner must review rights in any external contributions before licensing them. The build inventory and collected notices require human comparison; some vendor notices may not be present in Python package RECORD lists.
 
-Recommended next step: use immutable BtbN release assets and record expected hashes, build recipe revisions and source bundles. The current workflow records the resolved archive hash and FFprobe version/configuration, but retains latest to avoid pretending a historical immutable asset URL is known. Each manually distributed build needs sources corresponding to THAT build; sources from another latest build are not acceptable. Do not publish a Release until these obligations are satisfied.
+Recommended next step: use immutable BtbN release assets and record expected hashes, build recipe revisions and source bundles. The current workflow now pins a verified dated FFprobe release and both source archives; see ffprobe-traceability.md. It does not reuse latest. Exact static dependency/cache correspondence remains unverified and independently blocks portable distribution. Each manually distributed build needs sources corresponding to THAT build; sources from another latest build are not acceptable. Do not publish a Release until these obligations are satisfied.
 
 
 ## Follow-up: Qt notices and source verification
@@ -41,3 +41,8 @@ Recommended next step: use immutable BtbN release assets and record expected has
 The owner reported a successful Windows evidence build, with commercial-only collected Qt notices and PDF/QML/Quick/VirtualKeyboard DLLs. This was not independently retrieved (API Forbidden). The updated collector fetches version-tagged immutable Qt/PySide source archives and their open-source license texts, copyright notices and attributions based on the actual frozen DLL inventory. Commercial terms are retained only as unused alternatives, never as proof for GPL licensing. Checked-in core Qt open-source texts are copied into packaging as well.
 
 A Widgets-specific PyInstaller hook removes optional PDF/virtual-keyboard plugins before dependency analysis. Required DLLs are not forcibly deleted; QML/Quick may remain as link-time dependencies and then require qtdeclarative source/notice evidence. Windows CI adds platform and file-dialog smoke tests and generates a fresh inventory. Local source lookup succeeded for qtbase/qtsvg/pyside-setup v6.12.0; this is not an inspection of the user's Windows binary. Full corresponding sources and vendor build recipes, including exact FFprobe static dependency revisions, remain subject to verification. See [reproducible assembly procedure](corresponding-sources.md).
+
+
+## Pinned FFprobe follow-up
+
+See [FFprobe traceability](ffprobe-traceability.md) for independently downloaded archive/executable/source hashes and verified full FFmpeg and release-tag revisions. A tag-target recipe is not proof of actual build-image inputs. Distribution remains blocked until static/transitive sources, notices and actual toolchain provenance are established. No legal completeness or binary reproducibility claim is made.

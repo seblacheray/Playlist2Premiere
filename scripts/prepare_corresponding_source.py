@@ -19,6 +19,9 @@ def file_sha256(path):
     return digest.hexdigest()
 
 
+FFPROBE_LOCK_PATH = Path(__file__).resolve().parents[1] / '.github/ffprobe-lock.json'
+
+
 REQUIRED = {'qt', 'pyside', 'ffmpeg', 'btbn-build', 'python', 'pyinstaller'}
 
 
@@ -149,6 +152,23 @@ def verify(archive_path, evidence):
         commits = component.get('module_revisions', {})
         if commits.get(source['component']) != source['revision']:
             raise ValueError('Qt/PySide module revision differs from source evidence')
+    lock_path = evidence / 'ffprobe-pinned' / 'ffprobe-lock.json'
+    if not lock_path.is_file():
+        raise ValueError('Pinned FFprobe provenance required for distribution')
+    lock = json.loads(FFPROBE_LOCK_PATH.read_text())
+    if json.loads(lock_path.read_text()) != lock:
+        raise ValueError('Evidence lock differs from reviewed checkout lock')
+    if by_id['ffmpeg']['revision'] != lock['ffmpeg_revision']:
+        raise ValueError('FFmpeg source revision differs from pinned full revision')
+    if by_id['btbn-build']['revision'] != lock['btbn_release_tag_revision']:
+        raise ValueError('BtbN source recipe differs from pinned release tag')
+    if by_id['ffmpeg'].get('binary_sha256') != lock['ffprobe_sha256']:
+        raise ValueError('Source manifest must identify pinned FFprobe binary hash')
+    for pinned in lock['source_archives']:
+        if pinned['sha256'] not in [entry['sha256'] for entry in by_id[pinned['component']]['files']]:
+            raise ValueError('Pinned source archive must be included verbatim in source bundle')
+    if not lock.get('source_correspondence_verified'):
+        raise ValueError('FFprobe source correspondence remains unresolved; distribution blocked')
     report = {'verified': 'Declared versions, source-file hashes and module revisions',
               'component_ids': sorted(by_id),
               'unverified': ['Static library list completeness', 'Vendor patches and toolchain equivalence',

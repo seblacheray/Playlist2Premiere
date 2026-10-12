@@ -8,6 +8,24 @@ import subprocess
 import sys
 
 
+FFPROBE_LOCK_PATH = Path(__file__).resolve().parents[1] / '.github/ffprobe-lock.json'
+
+
+def verify_embedded_ffprobe(executable, destination):
+    from PyInstaller.archive.readers import CArchiveReader
+    lock = json.loads(FFPROBE_LOCK_PATH.read_text())
+    archive = CArchiveReader(str(executable))
+    names = [name for name in archive.toc if Path(name.replace('\\', '/')).name.lower() == 'ffprobe.exe']
+    if len(names) != 1:
+        raise RuntimeError('Exactly one embedded FFprobe executable required')
+    digest = hashlib.sha256(archive.extract(names[0])).hexdigest()
+    if digest != lock['ffprobe_sha256']:
+        raise RuntimeError('Embedded FFprobe differs from pinned binary')
+    (Path(destination) / 'embedded-ffprobe-verification.json').write_text(json.dumps({
+        'entry': names[0], 'sha256': digest, 'version_locked': lock['ffprobe_version'],
+        'method': 'Extract bytes from final PyInstaller CArchive and compare SHA-256'}, indent=2), encoding='utf-8')
+
+
 def main():
     destination = Path(sys.argv[1])
     destination.mkdir(parents=True, exist_ok=True)
@@ -40,6 +58,7 @@ def main():
     (destination / 'installed-packages.json').write_text(json.dumps(packages, indent=2), encoding='utf-8')
     with (destination / 'frozen-inventory.txt').open('w', encoding='utf-8') as handle:
         subprocess.run([sys.executable, '-m', 'PyInstaller.utils.cliutils.archive_viewer', '-l', '-r', 'dist/Playlist2Premiere.exe'], stdout=handle, stderr=subprocess.STDOUT, check=True)
+    verify_embedded_ffprobe('dist/Playlist2Premiere.exe', destination)
     from collect_qt_legal import collect
     collect(destination)
     subprocess.run(['git', 'archive', '--format=zip', '--output=' + str(destination / 'project-source.zip'), 'HEAD'], check=True)

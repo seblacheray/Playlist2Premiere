@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "release_tag": "autobuild-2026-10-12-13-12",
+  "archive_url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-12-13-12/ffmpeg-N-127388-g615b07170e-win64-gpl.zip",
+  "archive_sha256": "b79906cf805b8a43e7bc061715acddb4a48ac6534a9e30768217e546104b8bee",
+  "checksums_url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-12-13-12/checksums.sha256",
+  "ffprobe_sha256": "4139072494710643369eb06a41e43df3113e7c921182d69a261ec48fac0d98be",
+  "ffprobe_version": "N-127388-g615b07170e-20261012",
+  "ffprobe_configuration": "--prefix=/ffbuild/prefix --pkg-config-flags=--static --pkg-config=pkg-config --cross-prefix=x86_64-w64-mingw32- --arch=x86_64 --target-os=mingw32 --enable-gpl --enable-version3 --disable-debug --disable-w32threads --enable-pthreads --enable-iconv --enable-zlib --enable-libxml2 --enable-libvmaf --disable-libxcb --disable-xlib --enable-fontconfig --enable-libharfbuzz --enable-libfreetype --enable-libfribidi --enable-lcms2 --enable-vulkan --enable-libdav1d --enable-libvorbis --enable-librav1e --enable-librsvg --disable-libpulse --enable-gmp --enable-lzma --enable-liblcevc-dec --enable-opencl --enable-amf --enable-libaom --enable-avisynth --enable-chromaprint --enable-libdavs2 --enable-libdvdread --enable-libdvdnav --disable-libfdk-aac --enable-ffnvcodec --enable-cuda-llvm --enable-frei0r --enable-libgme --enable-libkvazaar --enable-libaribb24 --enable-libaribcaption --enable-libass --enable-libbluray --enable-libcurl --enable-libjxl --enable-libmp3lame --enable-libopus --enable-libplacebo --enable-librist --enable-libssh --enable-libtheora --enable-libvpx --enable-libwebp --enable-libzmq --enable-lv2 --enable-libvpl --enable-openal --enable-liboapv --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopenmpt --enable-librubberband --enable-schannel --enable-sdl2 --enable-libsnappy --enable-libsoxr --enable-libsrt --enable-libsvtav1 --enable-libtwolame --enable-libuavs3d --disable-libdrm --enable-vaapi --enable-vapoursynth --enable-libvidstab --enable-libvvenc --disable-whisper --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxvid --enable-libzimg --enable-libzvbi --extra-cflags=-DLIBTWOLAME_STATIC --extra-cxxflags= --extra-libs=-lgomp --extra-ldflags=-pthread --extra-ldexeflags= --cc=x86_64-w64-mingw32-gcc --cxx=x86_64-w64-mingw32-g++ --ar=x86_64-w64-mingw32-gcc-ar --ranlib=x86_64-w64-mingw32-gcc-ranlib --nm=x86_64-w64-mingw32-gcc-nm --extra-version=20261012",
+  "ffprobe_configuration_sha256": "ea6b855b27e0e66035b67bd4bdec06de830f2729a0ce76ae0d3bcfb452674d08",
+  "ffmpeg_revision": "615b07170e30d79ad5906418ea49f81c3cbd8457",
+  "btbn_release_tag_revision": "63ac3265b0789ea16c7b1f8351cd2ad195a28722",
+  "btbn_recipe_correspondence": "Release tag target verified; actual build/container correspondence unverified",
+  "source_archives": [
+    {
+      "component": "ffmpeg",
+      "revision": "615b07170e30d79ad5906418ea49f81c3cbd8457",
+      "url": "https://codeload.github.com/FFmpeg/FFmpeg/zip/615b07170e30d79ad5906418ea49f81c3cbd8457",
+      "sha256": "bd699597c7403864b689dc703a63f595f02b0061c53ab3249f0f7a31dbbe2f43"
+    },
+    {
+      "component": "btbn-build",
+      "revision": "63ac3265b0789ea16c7b1f8351cd2ad195a28722",
+      "url": "https://codeload.github.com/BtbN/FFmpeg-Builds/zip/63ac3265b0789ea16c7b1f8351cd2ad195a28722",
+      "sha256": "4af54438fa804f6122f46738e525f086b700897e553baa765be8a2abe07199b4"
+    }
+  ],
+  "source_correspondence_verified": false,
+  "distribution_blockers": [
+    "Exact static link map/component inventory missing",
+    "Build container/toolchain digests and dependency cache provenance missing",
+    "Transitive dependency/submodule/Rust Cargo sources, patches and corresponding notices not fully established"
+  ],
+  "historical_latest_archive_sha256": "4480b1abcae8bb46146e271fe603efaa90f29671ff9013bb0aed2d64d12951c8",
+  "historical_note": "New dated archive is distinct from the historical latest ZIP; no claim of archive identity."
+}
