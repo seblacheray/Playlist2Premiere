@@ -168,3 +168,20 @@ def test_export_changes_only_windows_pathurl(monkeypatch):
     assert root.findtext('./sequence/duration') == '318'
     assert [(c.findtext('start'), c.findtext('end')) for c in root.findall('./sequence/media/video/track/clipitem')] == [('0', '124'), ('124', '247'), ('247', '318')]
     assert len(root.findall('./sequence/media/video/track/clipitem/sourcetrack')) == 3
+
+
+def test_windows_reserved_characters_produce_valid_xml():
+    from pathlib import PureWindowsPath
+    from urllib.parse import unquote, urlsplit
+    # These characters are legal in Windows filenames, but reserved in URI/XML syntax.
+    path = PureWindowsPath("D:/L'été & montage/[prise] #1 + 100% ;,@=.mp4")
+    source = Media(path, F(123, 25), F(25), 1920, 1080, 0, F(0), ())
+    payload = export_bytes(build_timeline([source]))
+    root = ET.fromstring(payload)
+    uri = root.findtext('.//file/pathurl')
+    assert uri == "file://localhost/D%3a/L%27%C3%A9t%C3%A9%20%26%20montage/%5Bprise%5D%20%231%20%2B%20100%25%20%3B%2C%40%3D.mp4"
+    parsed = urlsplit(uri)
+    assert parsed.netloc == 'localhost'
+    assert parsed.query == parsed.fragment == ''
+    assert unquote(parsed.path) == '/' + path.as_posix()
+    assert root.findtext('.//clipitem/name') == path.name
