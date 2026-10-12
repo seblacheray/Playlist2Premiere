@@ -8,4 +8,4 @@ Consultées pendant le développement :
 
 `xmeml` est distinct de FCPXML moderne. Racine version 5, une séquence, format vidéo, piste vidéo, pistes audio, éléments `clipitem`, définitions `file` identifiées et réutilisées. Les URI de médias sont construites par `Path.as_uri()` pour encoder accents, espaces, `#` et autres caractères réservés. Sur Windows, cette méthode représente les lecteurs et chemins UNC selon les règles de pathlib. Les liens clip vidéo/audio sont bidirectionnels et leurs indices reflètent leur piste réelle.
 
-La preuve actuelle est structurelle et fonctionnelle côté moteur ; aucune certification de conformité complète à la DTD ou de comportement de Premiere n’est revendiquée.
+Les tests automatisés vérifient la structure XML et le moteur. L’utilisateur a également rapporté des imports manuels réussis sous Windows pour les quatre combinaisons PLS/MPCPL et Premiere Pro 2026/DaVinci Resolve 21, sur ses médias de test. Ces essais ne constituent ni une certification complète de conformité à la DTD, ni une validation de tous les formats médias et cas complexes.
