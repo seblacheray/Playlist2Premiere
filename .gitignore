@@ -6,3 +6,36 @@ build/
 dist/
 *.spec
 examples/media/
+
+# Local environment values; keep documented templates available for tracking.
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# Private keys and credential stores (never commit real values).
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+credentials
+credentials.*
+.credentials/
+secrets.json
+secrets.yaml
+secrets.yml
+.secrets/
+!.credentials.example
+!credentials.example
+!credentials.sample
+!credentials.template
+!secrets.example.json
+!secrets.example.yaml
+!secrets.example.yml
