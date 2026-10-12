@@ -4,7 +4,7 @@ import sys
 
 def packaging_smoke_test(source, destination):
     from pathlib import Path
-    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QApplication, QFileDialog
     from playlist2premiere.gui import Window
     from playlist2premiere.probe import find_ffprobe, probe
     from playlist2premiere.timeline import build_timeline
@@ -13,6 +13,16 @@ def packaging_smoke_test(source, destination):
     window = Window()
     window.show()
     app.processEvents()
+    window.playlist.setText(str(source))
+    window.directory.setText(str(Path(source).parent))
+    dialog = QFileDialog(window)
+    dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+    dialog.setDirectory(str(Path(source).parent))
+    dialog.show()
+    app.processEvents()
+    if not window.isVisible() or not dialog.isVisible():
+        raise RuntimeError('Qt Widgets window/dialog failed to start')
+    dialog.close()
     bundled = Path(sys._MEIPASS) / 'ffprobe.exe'
     if Path(find_ffprobe()) != bundled or not bundled.is_file():
         raise RuntimeError('Embedded FFprobe was not selected')

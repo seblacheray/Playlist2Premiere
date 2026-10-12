@@ -13,6 +13,7 @@ def main():
     destination.mkdir(parents=True, exist_ok=True)
     for name in ('LICENSE', 'THIRD-PARTY.md', 'docs/license-compliance.md'):
         shutil.copy2(name, destination / Path(name).name)
+    shutil.copytree('licenses', destination / 'project-third-party-license-texts', dirs_exist_ok=True)
     python_license = next((path for path in (Path(sys.base_prefix) / 'LICENSE.txt', Path(sys.base_prefix) / 'LICENSE') if path.is_file()), None)
     if python_license is None:
         raise RuntimeError('CPython license text missing from installation; provide it before packaging')
@@ -39,11 +40,13 @@ def main():
     (destination / 'installed-packages.json').write_text(json.dumps(packages, indent=2), encoding='utf-8')
     with (destination / 'frozen-inventory.txt').open('w', encoding='utf-8') as handle:
         subprocess.run([sys.executable, '-m', 'PyInstaller.utils.cliutils.archive_viewer', '-l', '-r', 'dist/Playlist2Premiere.exe'], stdout=handle, stderr=subprocess.STDOUT, check=True)
+    from collect_qt_legal import collect
+    collect(destination)
     subprocess.run(['git', 'archive', '--format=zip', '--output=' + str(destination / 'project-source.zip'), 'HEAD'], check=True)
     exe = Path('dist/Playlist2Premiere.exe')
     (destination / 'build-provenance.json').write_text(json.dumps({
         'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
-        'python': sys.version, 'executable_sha256': hashlib.sha256(exe.read_bytes()).hexdigest(),
+        'python': sys.version, 'python_version': '.'.join(map(str, sys.version_info[:3])), 'executable_sha256': hashlib.sha256(exe.read_bytes()).hexdigest(),
         'inventory_scope': 'Installed packages are a superset; inspect frozen-inventory.txt for shipped contents',
         'compliance_status': 'Requires owner verification of notices and corresponding sources'}, indent=2), encoding='utf-8')
 

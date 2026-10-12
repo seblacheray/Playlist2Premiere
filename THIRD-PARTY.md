@@ -15,4 +15,4 @@ The project is GPL-3.0-or-later. This does not relicense dependencies.
 
 Development dependencies are not presumed to be shipped. Installed-package metadata alone does not identify frozen contents. No component is attributed to Seb Lacheray merely because it is bundled.
 
-The Windows package includes a frozen-archive inventory, environment versions, collected vendor license files and build provenance. These are evidence for review, not a legal compliance certificate. Missing licenses and exact corresponding sources must be resolved before distribution.
+The Windows package includes a frozen-archive inventory, environment versions, collected vendor license files, version-tagged Qt/PySide open-source license texts and attribution records, source archive hashes and build provenance. PySide/Shiboken uses the GPL-3.0-only option; LicenseRef-Qt-Commercial is not the chosen licensing route. Checked-in core texts are in licenses/qt; complete source-header attributions are retained in the source evidence archives. These are evidence for review, not a legal compliance certificate. Missing licenses and exact corresponding sources must be resolved before distribution.

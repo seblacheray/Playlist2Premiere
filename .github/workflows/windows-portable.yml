@@ -75,6 +75,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect FFprobe configuration' }
           if ($configuration -match '--enable-nonfree') { throw 'Nonfree FFprobe cannot be distributed' }
           if ($configuration -notmatch '--enable-gpl' -or $configuration -notmatch '--enable-version3') { throw 'Expected GPL v3 FFprobe configuration' }
+          $licenseText = (& $probe[0].FullName -L 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0 -or $licenseText -notmatch 'GNU General Public License') { throw 'FFprobe GPL license text unavailable' }
+          $licenseText | Set-Content (Join-Path $env:RUNNER_TEMP 'ffprobe-license.txt')
           $configuration | Set-Content (Join-Path $env:RUNNER_TEMP 'ffprobe-configuration.txt')
           $probe[0].DirectoryName >> $env:GITHUB_PATH
           "FFPROBE_EXE=$($probe[0].FullName)" >> $env:GITHUB_ENV
@@ -112,6 +115,25 @@ jobs:
           [xml]$xml = Get-Content -LiteralPath $result -Raw
           if (@($xml.xmeml.sequence.media.video.track.clipitem).Count -ne 1) { throw 'Missing video clip' }
           if (@($xml.xmeml.sequence.media.audio.track).Count -ne 2) { throw 'Missing stereo audio' }
+      - name: Smoke test retained Windows platform plugin
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = (Resolve-Path dist/Playlist2Premiere.exe).Path
+          $media = Join-Path $env:RUNNER_TEMP 'médias & test #1'
+          $fixturePath = Join-Path $media 'vidéo & test.mp4'
+          $result = Join-Path $media 'windows-platform.xml'
+          $oldPlatform = $env:QT_QPA_PLATFORM
+          $oldPath = $env:PATH
+          try {
+            $env:QT_QPA_PLATFORM = 'windows'
+            $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+            $process = Start-Process -FilePath $exe -ArgumentList @('--packaging-smoke-test', "`"$fixturePath`"", "`"$result`"") -PassThru
+            if (!$process.WaitForExit(120000)) { $process.Kill(); throw 'Windows platform smoke test timed out' }
+            if ($process.ExitCode -ne 0 -or !(Test-Path -LiteralPath $result)) { throw 'Windows Qt platform smoke test failed' }
+            [xml]$xml = Get-Content -LiteralPath $result -Raw
+            if (@($xml.xmeml.sequence.media.video.track.clipitem).Count -ne 1) { throw 'Windows platform export missing' }
+          } finally { $env:QT_QPA_PLATFORM = $oldPlatform; $env:PATH = $oldPath }
       - name: Prepare portable download and notices
         shell: pwsh
         run: |
@@ -130,6 +152,9 @@ jobs:
           python scripts/package_legal.py portable/legal
           if ($LASTEXITCODE -ne 0) { throw 'Legal evidence collection failed' }
           Copy-Item "$env:RUNNER_TEMP/ffprobe-configuration.txt" portable/legal/
+          Copy-Item "$env:RUNNER_TEMP/ffprobe-license.txt" portable/legal/
+          Copy-Item scripts/build_windows.ps1 portable/legal/
+          Copy-Item scripts/pyinstaller_hooks portable/legal/ -Recurse
           Copy-Item LICENSE portable/
           Copy-Item THIRD-PARTY.md portable/
       - name: Attach reviewed corresponding sources
@@ -146,17 +171,11 @@ jobs:
           $archive = 'portable/legal/corresponding-source.zip'
           Invoke-WebRequest $uri.AbsoluteUri -OutFile $archive
           if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $env:SOURCE_SHA256) { throw 'Source archive checksum mismatch' }
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $archive))
-          try {
-            $entry = $zip.GetEntry('SOURCE-MANIFEST.json')
-            if (!$entry) { throw 'SOURCE-MANIFEST.json is required at archive root' }
-            $reader = [System.IO.StreamReader]::new($entry.Open())
-            try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
-            if (!$manifest.components) { throw 'Source manifest must identify components' }
-          } finally { $zip.Dispose() }
+          python scripts/prepare_corresponding_source.py verify $archive portable/legal
+          if ($LASTEXITCODE -ne 0) { throw 'Source version/hash/revision verification failed' }
           "$env:SOURCE_URL`nSHA-256: $env:SOURCE_SHA256`nOwner review confirmed; completeness is not automatically certified." | Set-Content portable/legal/source-provenance.txt
       - name: Upload review evidence (no portable executable)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Windows-license-review-evidence
