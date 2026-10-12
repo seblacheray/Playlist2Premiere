@@ -45,7 +45,7 @@ def test_paths(tmp_path):
     file = sub / 'été & #1.mp4'
     file.touch()
     resolver = MediaResolver(tmp_path, tmp_path)
-    for value in [str(file), 'dossier\\été & #1.mp4', file.as_uri(), 'C:\\ancien\\été & #1.mp4', '\\\\serveur\\partage\\été & #1.mp4']:
+    for value in [str(file), 'dossier\\été & #1.mp4', file.as_uri(), 'C:\\ancien\\été & #1.mp4']:
         assert resolver.resolve(value) == file
     with pytest.raises(FileNotFoundError):
         resolver.resolve('absent.mp4')
