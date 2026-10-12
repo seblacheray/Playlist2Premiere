@@ -2,6 +2,19 @@ name: Windows portable
 
 on:
   workflow_dispatch:
+    inputs:
+      source_archive_url:
+        description: 'HTTPS URL of the exact corresponding-source ZIP (with SOURCE-MANIFEST.json)'
+        type: string
+        required: false
+      source_archive_sha256:
+        description: 'Expected SHA-256 of the reviewed source ZIP'
+        type: string
+        required: false
+      sources_reviewed:
+        description: 'Owner confirms sources and notices cover the exact built components'
+        type: boolean
+        default: false
   push:
     branches: [main]
   pull_request:
@@ -58,6 +71,11 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Downloaded executable cannot run: $executable" }
           }
           "FFMPEG_DOWNLOAD_URL=$release/$asset" >> $env:GITHUB_ENV
+          $configuration = (& $probe[0].FullName -version 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect FFprobe configuration' }
+          if ($configuration -match '--enable-nonfree') { throw 'Nonfree FFprobe cannot be distributed' }
+          if ($configuration -notmatch '--enable-gpl' -or $configuration -notmatch '--enable-version3') { throw 'Expected GPL v3 FFprobe configuration' }
+          $configuration | Set-Content (Join-Path $env:RUNNER_TEMP 'ffprobe-configuration.txt')
           $probe[0].DirectoryName >> $env:GITHUB_PATH
           "FFPROBE_EXE=$($probe[0].FullName)" >> $env:GITHUB_ENV
           "FFMPEG_TOOLS=$tools" >> $env:GITHUB_ENV
@@ -107,7 +125,48 @@ jobs:
           Copy-Item "$root\*" portable/ffmpeg-notices/ -Recurse -Exclude bin
           "FFprobe: BtbN standalone Windows x64 GPL build. Download: $env:FFMPEG_DOWNLOAD_URL. Archive SHA-256: $env:FFMPEG_SHA256`nSource and build information: https://github.com/BtbN/FFmpeg-Builds`nFFmpeg source: https://github.com/FFmpeg/FFmpeg`nPySide6/Qt license information: https://doc.qt.io/qtforpython-6/licenses.html" | Set-Content portable/THIRD-PARTY.txt
           Get-FileHash portable/Playlist2Premiere.exe -Algorithm SHA256 | Format-List | Out-File portable/SHA256.txt
+      - name: Collect license texts and build inventory
+        run: |
+          python scripts/package_legal.py portable/legal
+          if ($LASTEXITCODE -ne 0) { throw 'Legal evidence collection failed' }
+          Copy-Item "$env:RUNNER_TEMP/ffprobe-configuration.txt" portable/legal/
+          Copy-Item LICENSE portable/
+          Copy-Item THIRD-PARTY.md portable/
+      - name: Attach reviewed corresponding sources
+        if: github.event_name == 'workflow_dispatch' && inputs.sources_reviewed
+        env:
+          SOURCE_URL: ${{ inputs.source_archive_url }}
+          SOURCE_SHA256: ${{ inputs.source_archive_sha256 }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uri = [Uri]$env:SOURCE_URL
+          if (!$uri.IsAbsoluteUri -or $uri.Scheme -ne 'https' -or $uri.UserInfo) { throw 'A public HTTPS source archive URL without credentials is required' }
+          if ($env:SOURCE_SHA256 -notmatch '^[a-fA-F0-9]{64}$') { throw 'Expected source archive SHA-256 required' }
+          $archive = 'portable/legal/corresponding-source.zip'
+          Invoke-WebRequest $uri.AbsoluteUri -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $env:SOURCE_SHA256) { throw 'Source archive checksum mismatch' }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $archive))
+          try {
+            $entry = $zip.GetEntry('SOURCE-MANIFEST.json')
+            if (!$entry) { throw 'SOURCE-MANIFEST.json is required at archive root' }
+            $reader = [System.IO.StreamReader]::new($entry.Open())
+            try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+            if (!$manifest.components) { throw 'Source manifest must identify components' }
+          } finally { $zip.Dispose() }
+          "$env:SOURCE_URL`nSHA-256: $env:SOURCE_SHA256`nOwner review confirmed; completeness is not automatically certified." | Set-Content portable/legal/source-provenance.txt
+      - name: Upload review evidence (no portable executable)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-license-review-evidence
+          path: |
+            portable/legal/
+            portable/ffmpeg-notices/
+            portable/THIRD-PARTY.txt
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' && inputs.sources_reviewed
         with:
           name: Playlist2Premiere-Windows-x64-portable
           path: portable/
