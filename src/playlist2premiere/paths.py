@@ -23,13 +23,21 @@ class MediaResolver:
         local = Path(value.replace('\\', '/'))
         candidates = [local] if local.is_absolute() or windows.is_absolute() else [self.playlist_dir / local, self.media_dir / local]
         for candidate in candidates:
-            if candidate.is_file():
+            try:
+                exists = candidate.is_file()
+            except OSError:
+                # An unavailable network path may raise instead of returning False.
+                # Only this existence check falls back; other errors remain visible.
+                continue
+            if exists:
                 return candidate.resolve()
         if self._index is None:
-            self._index = {}
+            index = {}
             for path in self.media_dir.rglob('*'):
                 if path.is_file():
-                    self._index.setdefault(path.name.casefold(), []).append(path)
+                    index.setdefault(path.name.casefold(), []).append(path)
+            # Publish only a complete index; a failed scan must not hide ambiguity.
+            self._index = index
         matches = self._index.get(windows.name.casefold(), [])
         if len(matches) > 1:
             raise ValueError(f'Chemin ambigu ({len(matches)} fichiers) : {value}')
