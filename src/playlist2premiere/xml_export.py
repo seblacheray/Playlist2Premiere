@@ -1,10 +1,21 @@
 """FCP 7 xmeml v5. Source in/out are media-relative frames, not invented timecode."""
-from pathlib import Path
+from pathlib import Path, PurePath
 from fractions import Fraction
 import os
 import tempfile
+import re
 import xml.etree.ElementTree as ET
 from .timeline import Timeline, rate_parts, frames
+
+
+def premiere_pathurl(path: PurePath) -> str:
+    """Use Premiere's local Windows drive URI spelling without double encoding."""
+    uri = path.as_uri()
+    match = re.fullmatch(r'file:///([A-Za-z]):(/.*)', uri)
+    if match:
+        return f'file://localhost/{match[1]}%3a{match[2]}'
+    # Preserve UNC and POSIX URI behavior; the experiment covered drive paths only.
+    return uri
 
 
 def node(parent, tag, value=None, **attrs):
@@ -83,7 +94,7 @@ def export_bytes(timeline: Timeline, name='Playlist2Premiere') -> bytes:
             if file_id not in defined:
                 defined.add(file_id)
                 node(file_element, 'name', source.path.name)
-                node(file_element, 'pathurl', source.path.as_uri())
+                node(file_element, 'pathurl', premiere_pathurl(source.path))
                 rate(file_element, source.fps)
                 node(file_element, 'duration', clip.source_end)
                 fm = node(file_element, 'media')

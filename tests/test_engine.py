@@ -6,7 +6,7 @@ from playlist2premiere.playlist import read_playlist, parse_pls, parse_mpcpl
 from playlist2premiere.paths import MediaResolver
 from playlist2premiere.probe import Media, Audio, parse_probe
 from playlist2premiere.timeline import build_timeline, Settings, frames
-from playlist2premiere.xml_export import export_bytes, write_xml
+from playlist2premiere.xml_export import export_bytes, write_xml, premiere_pathurl
 
 
 def media(path, fps=F(25), duration=F(1), audio=True):
@@ -90,7 +90,7 @@ def test_xml_duplicates_audio_rates_and_escaping(tmp_path):
     assert len(root.findall('.//sequence/media/audio/track')) == 2
     assert len(root.findall('.//sequence/media/audio/track/clipitem')) == 4
     assert len(root.findall('.//file/pathurl')) == 2
-    assert root.findtext('.//file/pathurl') == first.path.as_uri()
+    assert root.findtext('.//file/pathurl') == premiere_pathurl(first.path)
     assert root.find('.//timecode') is None
     for link in root.findall('.//link'):
         ref = link.findtext('linkclipref')
@@ -134,3 +134,37 @@ def test_probe_rejects_uncertain_metadata(tmp_path, change):
         del audio['duration']
     with pytest.raises(ValueError):
         parse_probe(tmp_path / 'a.mp4', {'streams': [video, audio], 'format': {'duration': '999'}})
+
+
+@pytest.mark.parametrize('source,expected', [
+    (r'D:\Videos\Part2.mp4', 'file://localhost/D%3a/Videos/Part2.mp4'),
+    (r'C:\Mes vidéos\été & #1 + 100%.mp4', 'file://localhost/C%3a/Mes%20vid%C3%A9os/%C3%A9t%C3%A9%20%26%20%231%20%2B%20100%25.mp4'),
+    (r'd:\dossier\déjà%20.mp4', 'file://localhost/d%3a/dossier/d%C3%A9j%C3%A0%2520.mp4'),
+])
+def test_premiere_windows_pathurl(source, expected):
+    from pathlib import PureWindowsPath
+    assert premiere_pathurl(PureWindowsPath(source)) == expected
+
+
+def test_unc_and_posix_urls_unchanged():
+    from pathlib import PureWindowsPath, PurePosixPath
+    for path in [PureWindowsPath(r'\\serveur\partage\été & #1.mp4'), PurePosixPath('/tmp/été & #1.mp4')]:
+        assert premiere_pathurl(path) == path.as_uri()
+
+
+def test_export_changes_only_windows_pathurl(monkeypatch):
+    from pathlib import PureWindowsPath
+    from playlist2premiere import xml_export
+    sources = [Media(PureWindowsPath(f'D:/Mes vidéos/Part{i}.mp4'), F(n, 25), F(25), 1920, 1080, 0, F(0), (Audio(1, 2, 48000, F(n, 25), F(0)),)) for i, n in enumerate([124, 123, 71], 1)]
+    timeline = build_timeline(sources)
+    corrected = export_bytes(timeline)
+    monkeypatch.setattr(xml_export, 'premiere_pathurl', lambda path: path.as_uri())
+    original = export_bytes(timeline)
+    expected = original
+    for source in sources:
+        expected = expected.replace(source.path.as_uri().encode(), premiere_pathurl(source.path).encode())
+    assert corrected == expected  # Includes audio, sourcetrack, IDs, rates and all timings.
+    root = ET.fromstring(corrected)
+    assert root.findtext('./sequence/duration') == '318'
+    assert [(c.findtext('start'), c.findtext('end')) for c in root.findall('./sequence/media/video/track/clipitem')] == [('0', '124'), ('124', '247'), ('247', '318')]
+    assert len(root.findall('./sequence/media/video/track/clipitem/sourcetrack')) == 3
