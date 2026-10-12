@@ -1,8 +1,8 @@
 # Playlist2Premiere
 
-Application Windows Python/PySide6 pour convertir une playlist vidéo `.pls` ou `.mpcpl` en séquence XML Final Cut Pro 7 (`xmeml` v5), destinée à un import dans Adobe Premiere Pro 2026.
+Application Windows Python/PySide6 qui importe les playlists vidéo **PLS (.pls)** et **MPCPL (.mpcpl)** et exporte une séquence **Final Cut Pro 7 XML (`xmeml` v5)** importable dans **Adobe Premiere Pro 2026** et **DaVinci Resolve 21**.
 
-**État : première version fonctionnelle du convertisseur ; import dans Premiere non encore validé.** Les tests Linux couvrent le moteur et FFprobe. Le démarrage Qt est contrôlé hors écran ; l’utilisation sur Windows et le packaging Windows restent à tester sur Windows.
+**Validation manuelle : les quatre combinaisons PLS → Premiere Pro 2026, MPCPL → Premiere Pro 2026, PLS → DaVinci Resolve 21 et MPCPL → DaVinci Resolve 21 ont été testées avec succès sur Windows par l’utilisateur, sur ses médias de test.** Ces résultats ne garantissent pas la compatibilité avec tous les formats de médias ou les cas complexes. Les tests automatisés couvrent le moteur, FFprobe et l’interface Qt hors écran ; le workflow GitHub Actions contrôle aussi la compilation Windows et le démarrage de l’exécutable portable.
 
 ## Installation Windows
 
@@ -40,7 +40,7 @@ Les positions `start/end` utilisent la cadence séquence ; `in/out` utilisent la
 
 Le test d’intégration nécessite `ffmpeg` et `ffprobe`, sinon il est explicitement ignoré. Le générateur produit trois MP4 colorés avec audio stéréo, cadences 24000/1001, 30000/1001 et 25, résolutions différentes, ainsi que `examples/three_clips.pls` et `examples/three_clips.xml`. Il refuse d’écraser des médias existants : pour recommencer, déplacer les exemples précédents. L’XML fourni référence les chemins absolus de la machine de génération ; régénérer sur Windows ou relier les médias dans Premiere.
 
-Voir [le protocole Premiere 2026](docs/premiere-validation.md) pour le test réel requis.
+Voir [le protocole Premiere 2026](docs/premiere-validation.md) pour reproduire les essais et vérifier de nouveaux médias ou de nouvelles versions.
 
 ## Créer un exécutable Windows
 
@@ -59,7 +59,7 @@ Résultat attendu : `dist/Playlist2Premiere.exe`. Sans inclusion, FFprobe doit r
 
 Les médias doivent être des vidéos à cadence constante, pixels carrés, progressifs, sans rotation ; une seule piste vidéo est acceptée. Une cadence moyenne différente de la cadence nominale est refusée. Ce contrôle ne prouve pas à lui seul qu’un fichier est exempt de toute variation de cadence : les vidéos connues comme VFR doivent être normalisées avant import. Les durées et débuts de pistes doivent être présents dans FFprobe ; la durée globale du conteneur et les indications de durée des playlists ne remplacent pas une durée vidéo manquante. Aucune durée n’est extrapolée.
 
-Les flux distants, périphériques MPCPL, fichiers de doublage externe, points cue et découpage source ne sont pas interprétés. Les playlists servent à sélectionner des fichiers complets, pas des sous-clips. La correspondance entre plusieurs flux audio, leurs canaux et l’importeur Premiere doit être vérifiée sur des médias représentatifs ; le cas de référence est vidéo + un flux stéréo. Aucune validation par DTD Apple ou dans Premiere n’a été effectuée dans cet environnement.
+Les flux distants, périphériques MPCPL, fichiers de doublage externe, points cue et découpage source ne sont pas interprétés. Les playlists servent à sélectionner des fichiers complets, pas des sous-clips. La correspondance entre plusieurs flux audio, leurs canaux et l’importeur Premiere doit être vérifiée sur des médias représentatifs ; le cas de référence est vidéo + un flux stéréo. Aucune validation par DTD Apple n’a été effectuée. Les imports Premiere et Resolve réussis rapportés par l’utilisateur ne valident pas tous les cas audio, médias ou cadences mixtes.
 
 ## Développement Linux
 

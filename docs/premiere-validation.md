@@ -1,6 +1,6 @@
 # Test réel dans Adobe Premiere Pro 2026 sous Windows
 
-Statut initial : **non exécuté**. Renseigner version exacte de Premiere, Windows, Python/FFmpeg, date et résultats après essai.
+**Résultats rapportés par l’utilisateur :** imports réussis sous Windows pour PLS et MPCPL dans Adobe Premiere Pro 2026, ainsi que dans DaVinci Resolve 21, sur ses médias de test. Ce protocole reste à appliquer pour de nouveaux médias, les cas complexes et les nouvelles versions ; le succès des quatre combinaisons ne signifie pas que chaque étape ci-dessous a été validée. Consigner version exacte des logiciels, Windows, Python/FFmpeg, date et résultats pour chaque nouvel essai.
 
 1. Installer l’application et FFmpeg sur Windows. Exécuter `scripts/make_example.py` pour créer les trois médias et un XML avec des chemins locaux Windows. Ne pas utiliser les chemins Linux du XML livré sans relier les médias.
 2. Dans Premiere Pro 2026, créer un projet vide puis utiliser **Fichier > Importer** pour sélectionner `examples/three_clips.xml`. Noter toute boîte de dialogue, erreur d’import ou demande de localisation des médias.
