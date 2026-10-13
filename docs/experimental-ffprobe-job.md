@@ -4,7 +4,7 @@
 
 Workflow **Experimental Windows FFprobe**, job `candidate`, uses windows-2022 plus MSYS2 UCRT64/MinGW-w64. It runs on relevant PR changes or manual dispatch when the workflow is available. It does not feed the portable build job, modify find_ffprobe, change the pinned BtbN binary, enable distribution, merge or create a Release.
 
-The scripts and workflow were checked locally. Native Windows compilation/result and candidate size are pending GitHub Actions: run/status/artifact API requests return Forbidden here. No successful Windows compile or measured candidate size is claimed. Inspect the artifact before concluding success.
+The scripts and workflow were checked locally. Native Windows compilation and comparison have now succeeded; see the observed run below. Artifact/log API requests return Forbidden and anonymous downloads return 404 here. The exact measured size and raw difference counts remain unread in this environment, although the job records them. Inspect the artifact or Actions summary while signed in to read these metrics.
 
 ## Build inputs and conservative profile
 
@@ -54,7 +54,7 @@ Only conclude a real Windows build after build-status=0 and native version/licen
 
 ## Local checks performed
 
-60 automated tests passed (35 original plus packaging and harness checks). Bash syntax and both workflow YAML files parsed. The harness generated the five media fixtures and compared the SAME system Linux probe against itself: four application-accepted fixtures, and matching MKV duration rejection, no raw differences. This is a harness self-test only, not baseline-vs-candidate validation and not Windows evidence.
+62 automated tests passed (35 original plus packaging and harness checks). Bash syntax and both workflow YAML files parsed. The harness generated the five media fixtures and compared the SAME system Linux probe against itself: four application-accepted fixtures, and matching MKV duration rejection, no raw differences. This is a harness self-test only, not baseline-vs-candidate validation and not Windows evidence.
 
 ## Failure follow-up
 
@@ -65,3 +65,12 @@ If compilation fails, inspect config.log/build.log and retained link map, keep t
 The public job page for run [38326182963](https://github.com/seblacheray/Playlist2Premiere/actions/runs/38326182963), commit 382e1c7, confirms success for the native build, corpus comparison, original tests and report upload. The first candidate therefore compiled and ran on Windows. The artifact was published (ID 11780329809), but anonymous artifact/log download returned 404 and API download/status requests returned Forbidden here. Its precise candidate size and raw difference counts were not read; the artifact ZIP size is not the executable size. Do not infer those metrics from overall job success.
 
 Follow-up corrects symbol collection to use FFmpeg's real unstripped target ffprobe_g.exe. MP4 comparison now requires actual application acceptance, while matching MKV duration rejection remains explicitly a baseline limitation. Size/hash/fixture differences are also written to the public Actions job summary to permit review when artifact API access is unavailable. Native results of these follow-ups must be distinguished from the first run.
+
+
+## Latest native result observed
+
+Run [38327293254](https://github.com/seblacheray/Playlist2Premiere/actions/runs/38327293254), commit e15ee6f, finished successfully on Windows (total 10m11s). The public step statuses confirm build, strengthened comparison, original test suite and technical artifact upload success. This run includes the corrected unstripped-symbol collection and MP4 acceptance requirements.
+
+The four MP4 fixtures (H.264/AAC integer and fractional rates, HEVC/AAC, two audio streams) therefore passed application acceptance, parsed-data/XML equivalence and source-integrity checks. The MKV comparison also passed its equality checks, but an identical application rejection is permitted and reported separately; its detailed acceptance value has not been read. Raw JSON difference counts and the exact candidate byte size are in comparison-summary.json/candidate-size.txt and the Actions summary; they are NOT inferred from the successful step. The artifact ZIP size is not the FFprobe executable size. Access to the detailed summary/artifact may require a GitHub sign-in even for a public repository.
+
+No new candidate executable was published. Existing packaged FFprobe, conversion code and false source-correspondence flag remain unchanged. Static toolchain/zlib source completeness, wider corpus coverage and reproducible inputs remain required before replacement or distribution.

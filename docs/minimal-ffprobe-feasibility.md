@@ -2,7 +2,7 @@
 
 ## Decision for this change
 
-Technically feasible, but NOT sufficiently validated to replace the current embedded binary. Only documentation changes are made. The pinned BtbN binary, its SHA-256 checks, packaging and distribution block remain unchanged. No new executable or native Windows inventory is claimed. No Release is published.
+Technically feasible, but NOT sufficiently validated to replace the current embedded binary. At the feasibility stage, only documentation was changed; the isolated experimental job was subsequently added as described below. The pinned BtbN binary, its SHA-256 checks, packaging and distribution block remain unchanged. No new executable or native Windows inventory is claimed. No Release is published.
 
 ## Actual application needs
 
