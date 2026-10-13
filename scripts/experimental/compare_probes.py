@@ -7,6 +7,7 @@ import argparse
 from fractions import Fraction
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -55,6 +56,28 @@ def compare_app(path, baseline, candidate):
             except (ValueError, KeyError, TypeError) as error:
                 results.append(('application_rejection', type(error).__name__, str(error)))
     return results[0] == results[1], results
+
+
+def fixture_passes(same, process_ok, media_unchanged, accepted, require_acceptance):
+    return same and process_ok and media_unchanged and (accepted or not require_acceptance)
+
+
+def publish_summary(summary):
+    filename = os.environ.get('GITHUB_STEP_SUMMARY')
+    if not filename:
+        return
+    lines = ['# Experimental FFprobe comparison',
+             f'Native Windows: {summary["native_windows"]}',
+             f'Candidate size: **{summary["candidate_size_bytes"]} bytes**',
+             f'Candidate SHA-256: `{summary["candidate_sha256"]}`',
+             f'Comparison passed: {summary.get("comparison_passed", "pending")}', '',
+             '| Fixture | Accepted by app | App equivalent | Raw JSON differences |',
+             '| --- | --- | --- | --- |']
+    for item in summary['fixtures']:
+        lines.append(f'| {item["name"]} | {item.get("accepted_by_application", "error")} | {item.get("app_equivalent", "error")} | {item.get("raw_difference_count", "error")} |')
+    lines += ['', 'Matching MKV duration rejections are baseline limitations, not usable-format validation.',
+              'Experimental binary only; no distribution or source-compliance approval.']
+    Path(filename).write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
 
 def main(args):
@@ -120,7 +143,7 @@ def main(args):
                                         'app_equivalent': same, 'accepted_by_application': accepted,
                                         'probe_processes_ok': process_ok, 'raw_difference_count': len(differences),
                                         'media_unchanged': media_unchanged})
-            failed |= not (same and process_ok and media_unchanged)
+            failed |= not fixture_passes(same, process_ok, media_unchanged, accepted, name.endswith('.mp4'))
         except Exception as error:
             summary['fixtures'].append({'name': name, 'error': f'{type(error).__name__}: {error}'})
             failed = True
@@ -128,6 +151,7 @@ def main(args):
     summary['comparison_passed'] = not failed
     summary['baseline_limitations'] = [item['name'] for item in summary['fixtures'] if item.get('probe_processes_ok') and not item.get('accepted_by_application')]
     (args.reports / 'comparison-summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
+    publish_summary(summary)
     if failed:
         raise SystemExit('Probe comparison failed; inspect reports. Existing distribution is unchanged.')
 

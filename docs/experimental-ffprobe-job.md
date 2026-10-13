@@ -59,3 +59,9 @@ Only conclude a real Windows build after build-status=0 and native version/licen
 ## Failure follow-up
 
 If compilation fails, inspect config.log/build.log and retained link map, keep the existing binary and fix the diagnosed prerequisite/flag/source issue on this branch. Missing runtime DLLs in PE imports require resolving static linkage or providing reviewed runtime files; do not hide them with PATH. Corpus regressions require retaining the relevant native support or a justified source-locked dependency; do not weaken application checks. API access is needed here to inspect actual job output; otherwise the owner can supply the textual evidence artifact for diagnosis. Distribution remains blocked throughout.
+
+## First native run observed
+
+The public job page for run [38326182963](https://github.com/seblacheray/Playlist2Premiere/actions/runs/38326182963), commit 382e1c7, confirms success for the native build, corpus comparison, original tests and report upload. The first candidate therefore compiled and ran on Windows. The artifact was published (ID 11780329809), but anonymous artifact/log download returned 404 and API download/status requests returned Forbidden here. Its precise candidate size and raw difference counts were not read; the artifact ZIP size is not the executable size. Do not infer those metrics from overall job success.
+
+Follow-up corrects symbol collection to use FFmpeg's real unstripped target ffprobe_g.exe. MP4 comparison now requires actual application acceptance, while matching MKV duration rejection remains explicitly a baseline limitation. Size/hash/fixture differences are also written to the public Actions job summary to permit review when artifact API access is unavailable. Native results of these follow-ups must be distinguished from the first run.

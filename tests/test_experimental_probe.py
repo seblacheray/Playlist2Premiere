@@ -50,3 +50,22 @@ def test_exact_probe_arguments_and_timeout(tmp_path, monkeypatch):
     assert calls[0][1]['timeout'] == 120
     assert 'shell' not in calls[0][1]
     assert result['exit_code'] == 0
+
+
+def test_core_mp4_requires_actual_application_acceptance():
+    assert not compare.fixture_passes(True, True, True, False, True)
+    assert compare.fixture_passes(True, True, True, False, False)
+    assert compare.fixture_passes(True, True, True, True, True)
+    assert not compare.fixture_passes(False, True, True, True, True)
+
+
+def test_public_summary_records_size_and_differences(tmp_path, monkeypatch):
+    path = tmp_path / 'summary.md'
+    monkeypatch.setenv('GITHUB_STEP_SUMMARY', str(path))
+    compare.publish_summary({'native_windows': True, 'candidate_size_bytes': 12345,
+                             'candidate_sha256': 'a' * 64, 'comparison_passed': True,
+                             'fixtures': [{'name': 'test.mp4', 'accepted_by_application': True,
+                                           'app_equivalent': True, 'raw_difference_count': 0}]})
+    text = path.read_text()
+    assert '12345 bytes' in text
+    assert '| test.mp4 | True | True | 0 |' in text
