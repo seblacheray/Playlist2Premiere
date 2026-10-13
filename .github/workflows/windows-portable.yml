@@ -2,6 +2,19 @@ name: Windows portable
 
 on:
   workflow_dispatch:
+    inputs:
+      source_archive_url:
+        description: 'HTTPS URL of the exact corresponding-source ZIP (with SOURCE-MANIFEST.json)'
+        type: string
+        required: false
+      source_archive_sha256:
+        description: 'Expected SHA-256 of the reviewed source ZIP'
+        type: string
+        required: false
+      sources_reviewed:
+        description: 'Owner confirms sources and notices cover the exact built components'
+        type: boolean
+        default: false
   push:
     branches: [main]
   pull_request:
@@ -35,31 +48,35 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          # Non-shared Windows x64 build: FFprobe runs without external FFmpeg DLLs.
-          $release = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest'
-          $asset = 'ffmpeg-master-latest-win64-gpl.zip'
-          $archive = Join-Path $env:RUNNER_TEMP $asset
-          $checksum = Join-Path $env:RUNNER_TEMP 'checksums.sha256'
-          Invoke-WebRequest "$release/checksums.sha256" -OutFile $checksum
-          $pattern = '^([a-fA-F0-9]{64})\s+\*?' + [regex]::Escape($asset) + '$'
-          $checksumLines = @(Get-Content $checksum | Where-Object { $_ -match $pattern })
-          if ($checksumLines.Count -ne 1) { throw "Expected exactly one published checksum for $asset" }
-          $expected = [regex]::Match($checksumLines[0], $pattern).Groups[1].Value
-          Invoke-WebRequest "$release/$asset" -OutFile $archive
-          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $expected) { throw 'FFmpeg checksum mismatch' }
-          $tools = Join-Path $env:RUNNER_TEMP 'ffmpeg-tools'
-          Expand-Archive $archive -DestinationPath $tools
-          $probe = @(Get-ChildItem $tools -Filter ffprobe.exe -Recurse -File)
-          $ffmpeg = @(Get-ChildItem $tools -Filter ffmpeg.exe -Recurse -File)
-          if ($probe.Count -ne 1 -or $ffmpeg.Count -ne 1) { throw 'Expected one FFprobe and FFmpeg executable' }
+          $tools = Join-Path $env:RUNNER_TEMP 'ffprobe-pinned'
+          python scripts/fetch_ffprobe.py $tools
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned tool/source download or verification failed' }
+          $report = Get-Content "$tools/fetch-report.json" -Raw | ConvertFrom-Json
+          $lock = Get-Content .github/ffprobe-lock.json -Raw | ConvertFrom-Json
+          $probe = @(Get-Item -LiteralPath $report.ffprobe_path)
+          $ffmpeg = @(Get-Item -LiteralPath $report.ffmpeg_path)
+          $expected = $lock.archive_sha256
+          $pinnedEvidence = $report.evidence
           foreach ($executable in @($probe[0].FullName, $ffmpeg[0].FullName)) {
             if (!(Test-Path -LiteralPath $executable -PathType Leaf) -or (Get-Item -LiteralPath $executable).Length -eq 0) { throw "Missing or empty executable: $executable" }
             & $executable -version
             if ($LASTEXITCODE -ne 0) { throw "Downloaded executable cannot run: $executable" }
           }
-          "FFMPEG_DOWNLOAD_URL=$release/$asset" >> $env:GITHUB_ENV
+          "FFMPEG_DOWNLOAD_URL=$($lock.archive_url)" >> $env:GITHUB_ENV
+          $configuration = (& $probe[0].FullName -version 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect FFprobe configuration' }
+          if ($configuration -notmatch [regex]::Escape($lock.ffprobe_version)) { throw 'Pinned FFprobe version mismatch' }
+          $configureLine = (($configuration -split "`n" | Where-Object { $_ -match '^configuration:' }) -replace '^configuration:\s*', '').Trim()
+          if ($configureLine -ne $lock.ffprobe_configuration) { throw 'Pinned FFprobe build configuration mismatch' }
+          if ($configuration -match '--enable-nonfree') { throw 'Nonfree FFprobe cannot be distributed' }
+          if ($configuration -notmatch '--enable-gpl' -or $configuration -notmatch '--enable-version3') { throw 'Expected GPL v3 FFprobe configuration' }
+          $licenseText = (& $probe[0].FullName -L 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0 -or $licenseText -notmatch 'GNU General Public License') { throw 'FFprobe GPL license text unavailable' }
+          $licenseText | Set-Content (Join-Path $env:RUNNER_TEMP 'ffprobe-license.txt')
+          $configuration | Set-Content (Join-Path $env:RUNNER_TEMP 'ffprobe-configuration.txt')
           $probe[0].DirectoryName >> $env:GITHUB_PATH
           "FFPROBE_EXE=$($probe[0].FullName)" >> $env:GITHUB_ENV
+          "FFPROBE_EVIDENCE=$pinnedEvidence" >> $env:GITHUB_ENV
           "FFMPEG_TOOLS=$tools" >> $env:GITHUB_ENV
           "FFMPEG_SHA256=$expected" >> $env:GITHUB_ENV
       - name: Run all tests including media integration
@@ -94,6 +111,25 @@ jobs:
           [xml]$xml = Get-Content -LiteralPath $result -Raw
           if (@($xml.xmeml.sequence.media.video.track.clipitem).Count -ne 1) { throw 'Missing video clip' }
           if (@($xml.xmeml.sequence.media.audio.track).Count -ne 2) { throw 'Missing stereo audio' }
+      - name: Smoke test retained Windows platform plugin
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = (Resolve-Path dist/Playlist2Premiere.exe).Path
+          $media = Join-Path $env:RUNNER_TEMP 'médias & test #1'
+          $fixturePath = Join-Path $media 'vidéo & test.mp4'
+          $result = Join-Path $media 'windows-platform.xml'
+          $oldPlatform = $env:QT_QPA_PLATFORM
+          $oldPath = $env:PATH
+          try {
+            $env:QT_QPA_PLATFORM = 'windows'
+            $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+            $process = Start-Process -FilePath $exe -ArgumentList @('--packaging-smoke-test', "`"$fixturePath`"", "`"$result`"") -PassThru
+            if (!$process.WaitForExit(120000)) { $process.Kill(); throw 'Windows platform smoke test timed out' }
+            if ($process.ExitCode -ne 0 -or !(Test-Path -LiteralPath $result)) { throw 'Windows Qt platform smoke test failed' }
+            [xml]$xml = Get-Content -LiteralPath $result -Raw
+            if (@($xml.xmeml.sequence.media.video.track.clipitem).Count -ne 1) { throw 'Windows platform export missing' }
+          } finally { $env:QT_QPA_PLATFORM = $oldPlatform; $env:PATH = $oldPath }
       - name: Prepare portable download and notices
         shell: pwsh
         run: |
@@ -107,7 +143,48 @@ jobs:
           Copy-Item "$root\*" portable/ffmpeg-notices/ -Recurse -Exclude bin
           "FFprobe: BtbN standalone Windows x64 GPL build. Download: $env:FFMPEG_DOWNLOAD_URL. Archive SHA-256: $env:FFMPEG_SHA256`nSource and build information: https://github.com/BtbN/FFmpeg-Builds`nFFmpeg source: https://github.com/FFmpeg/FFmpeg`nPySide6/Qt license information: https://doc.qt.io/qtforpython-6/licenses.html" | Set-Content portable/THIRD-PARTY.txt
           Get-FileHash portable/Playlist2Premiere.exe -Algorithm SHA256 | Format-List | Out-File portable/SHA256.txt
+      - name: Collect license texts and build inventory
+        run: |
+          python scripts/package_legal.py portable/legal
+          if ($LASTEXITCODE -ne 0) { throw 'Legal evidence collection failed' }
+          Copy-Item "$env:RUNNER_TEMP/ffprobe-configuration.txt" portable/legal/
+          Copy-Item "$env:RUNNER_TEMP/ffprobe-license.txt" portable/legal/
+          Copy-Item "$env:FFPROBE_EVIDENCE" portable/legal/ffprobe-pinned -Recurse
+          Copy-Item docs/ffprobe-recipe-candidates.json portable/legal/
+          Copy-Item scripts/build_windows.ps1 portable/legal/
+          Copy-Item scripts/pyinstaller_hooks portable/legal/ -Recurse
+          Copy-Item LICENSE portable/
+          Copy-Item THIRD-PARTY.md portable/
+      - name: Attach reviewed corresponding sources
+        if: github.event_name == 'workflow_dispatch' && inputs.sources_reviewed
+        env:
+          SOURCE_URL: ${{ inputs.source_archive_url }}
+          SOURCE_SHA256: ${{ inputs.source_archive_sha256 }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uri = [Uri]$env:SOURCE_URL
+          if (!$uri.IsAbsoluteUri -or $uri.Scheme -ne 'https' -or $uri.UserInfo) { throw 'A public HTTPS source archive URL without credentials is required' }
+          if ($env:SOURCE_SHA256 -notmatch '^[a-fA-F0-9]{64}$') { throw 'Expected source archive SHA-256 required' }
+          $archive = 'portable/legal/corresponding-source.zip'
+          Invoke-WebRequest $uri.AbsoluteUri -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $env:SOURCE_SHA256) { throw 'Source archive checksum mismatch' }
+          python scripts/prepare_corresponding_source.py verify $archive portable/legal
+          if ($LASTEXITCODE -ne 0) { throw 'Source version/hash/revision verification failed' }
+          "$env:SOURCE_URL`nSHA-256: $env:SOURCE_SHA256`nOwner review confirmed; completeness is not automatically certified." | Set-Content portable/legal/source-provenance.txt
+      - name: Upload review evidence (no portable executable)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-license-review-evidence
+          path: |
+            portable/legal/
+            ${{ runner.temp }}/ffprobe-pinned/evidence/
+            portable/ffmpeg-notices/
+            portable/THIRD-PARTY.txt
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch' && inputs.sources_reviewed
         with:
           name: Playlist2Premiere-Windows-x64-portable
           path: portable/

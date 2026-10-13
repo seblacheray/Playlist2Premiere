@@ -77,10 +77,19 @@ Installer FFmpeg via le gestionnaire système pour l’intégration. Pour un con
 Le workflow **Windows portable** s’exécute à chaque push sur `main`, pour les pull requests et manuellement via **Run workflow**. Il utilise Windows x64, Python 3.12, teste l’application avec FFmpeg/FFprobe, puis crée un exécutable PyInstaller contenant FFprobe. FFmpeg sert uniquement à générer les médias des tests : l’application n’en a pas besoin pour convertir les playlists, il n’est donc pas distribué dans l’exécutable.
 
 1. Ouvrir l’onglet **Actions** du dépôt GitHub et choisir **Windows portable**.
-2. Ouvrir une exécution réussie de la branche `main` (ou lancer **Run workflow** sur cette branche).
+2. Pour produire le ZIP portable, lancer **Run workflow** sur la branche `main` avec l’URL HTTPS et le SHA-256 des sources correspondantes revues, puis confirmer cette revue. Les builds automatiques publient uniquement les preuves de revue de licence ; voir [les obligations](docs/license-compliance.md).
 3. Dans **Artifacts**, télécharger **Playlist2Premiere-Windows-x64-portable**. Une connexion GitHub peut être nécessaire.
 4. Extraire le ZIP dans un dossier, conserver les notices fournies, puis lancer **Playlist2Premiere.exe**. Python, FFmpeg et FFprobe n’ont pas à être installés.
 
 Les artefacts sont conservés 30 jours. Le téléchargement comprend le SHA-256 de l’exécutable. Ce build n’est pas signé ; Windows peut afficher une notification SmartScreen. Il ne s’agit pas d’un installeur ni d’une publication GitHub Releases.
 
-Le workflow vérifie aussi l’exécutable compilé avec un PATH limité aux dossiers Windows : démarrage Qt hors écran, sélection du FFprobe embarqué, analyse d’un média avec accents/caractères spéciaux, puis export XML avec vidéo et deux canaux audio. Ce contrôle ne remplace pas l’essai interactif sur Windows ni l’import réel dans Premiere. FFprobe est téléchargé depuis les releases GitHub de BtbN/FFmpeg-Builds (archive Windows x64 GPL non partagée) et comparé à la ligne correspondante du manifeste `checksums.sha256` publié avant utilisation ; si le téléchargement ou la vérification échoue, la compilation est bloquée.
+Le workflow vérifie aussi l’exécutable compilé avec un PATH limité aux dossiers Windows : démarrage Qt hors écran, sélection du FFprobe embarqué, analyse d’un média avec accents/caractères spéciaux, puis export XML avec vidéo et deux canaux audio. Ce contrôle ne remplace pas l’essai interactif sur Windows ni l’import réel dans Premiere. FFprobe est téléchargé depuis une release datée de BtbN/FFmpeg-Builds (archive Windows x64 GPL non partagée) et vérifié avec les SHA-256 figés de l’archive et du binaire dans `.github/ffprobe-lock.json` ; si le téléchargement ou la vérification échoue, la compilation est bloquée.
+
+
+## Licence
+
+Copyright (C) 2026 Seb Lacheray. Le code de Playlist2Premiere est distribué sous **GNU GPL-3.0-or-later** : vous pouvez l’utiliser, le modifier et le redistribuer selon la GPL version 3 ou toute version ultérieure. Les versions dérivées redistribuées doivent respecter ses obligations, notamment la fourniture du code source correspondant. Le logiciel est fourni sans garantie, dans les limites prévues par la licence.
+
+Voir [LICENSE](LICENSE), les [notices tierces](THIRD-PARTY.md) et la [revue de distribution Windows](docs/license-compliance.md). Les composants tiers conservent leurs propres droits et licences. La distribution du ZIP portable est désormais conditionnée à la fourniture et à la revue de sources correspondantes ; une compilation réussie ne certifie pas sa conformité juridique.
+
+La distribution portable reste bloquée tant que la provenance des sources de toutes les dépendances statiques de FFprobe n’est pas établie, même avec une confirmation manuelle. Voir [la traçabilité FFprobe](docs/ffprobe-traceability.md).
