@@ -41,14 +41,14 @@ printf '%q ' "$source_dir/configure" "${flags[@]}" > "$report_dir/configure-comm
 printf '\n' >> "$report_dir/configure-command.txt"
 bash "$source_dir/configure" "${flags[@]}" 2>&1 | tee "$report_dir/configure.log"
 make -j2 V=1 ffprobe.exe 2>&1 | tee "$report_dir/build.log"
-sha256sum ffprobe.exe > "$report_dir/candidate-unstripped-sha256.txt"
+sha256sum ffprobe_g.exe > "$report_dir/candidate-unstripped-sha256.txt"
 cp ffprobe.exe ffprobe-candidate.exe
 strip --strip-unneeded ffprobe-candidate.exe
 sha256sum ffprobe-candidate.exe > "$report_dir/candidate-sha256.txt"
 wc -c ffprobe-candidate.exe > "$report_dir/candidate-size.txt"
 grep '^LOAD ' ffprobe-link.map > "$report_dir/linked-archives.txt" || true
 objdump -p ffprobe-candidate.exe > "$report_dir/pe-imports.txt"
-nm -g ffprobe.exe > "$report_dir/link-symbols.txt"
+nm -g ffprobe_g.exe > "$report_dir/link-symbols.txt"
 ./ffprobe-candidate.exe -version > "$report_dir/candidate-version.txt" 2>&1
 ./ffprobe-candidate.exe -buildconf > "$report_dir/candidate-buildconf.txt" 2>&1
 ./ffprobe-candidate.exe -L > "$report_dir/candidate-license.txt" 2>&1
