@@ -1,0 +1,95 @@
+name: Experimental Windows FFprobe
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/experimental/**'
+      - '.github/workflows/ffprobe-experimental.yml'
+      - '.github/ffprobe-lock.json'
+      - 'scripts/fetch_ffprobe.py'
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Prepare reports and install test dependencies
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory reports -Force | Out-Null
+          python -m pip install -e '.[dev]'
+          if ($LASTEXITCODE -ne 0) { throw 'Test dependency installation failed' }
+      - name: Fetch locked baseline and source inputs
+        shell: pwsh
+        run: |
+          $tools = Join-Path $env:RUNNER_TEMP 'ffprobe-baseline'
+          python scripts/fetch_ffprobe.py $tools
+          if ($LASTEXITCODE -ne 0) { throw 'Locked baseline verification failed' }
+          $report = Get-Content "$tools/fetch-report.json" -Raw | ConvertFrom-Json
+          "BASELINE_PROBE=$($report.ffprobe_path)" >> $env:GITHUB_ENV
+          "BASELINE_FFMPEG=$($report.ffmpeg_path)" >> $env:GITHUB_ENV
+          $report.ffprobe_path | Split-Path >> $env:GITHUB_PATH
+          $source = Join-Path $env:RUNNER_TEMP 'ffprobe-source'
+          Expand-Archive "$tools/ffmpeg-source.zip" -DestinationPath $source
+          $lock = Get-Content .github/ffprobe-lock.json -Raw | ConvertFrom-Json
+          "FFMPEG_SOURCE=$source/FFmpeg-$($lock.ffmpeg_revision)" >> $env:GITHUB_ENV
+          "CANDIDATE_BUILD=$env:RUNNER_TEMP/ffprobe-build" >> $env:GITHUB_ENV
+          "CANDIDATE_REPORTS=$env:GITHUB_WORKSPACE/reports" >> $env:GITHUB_ENV
+          Copy-Item .github/ffprobe-lock.json reports/baseline-source-lock.json
+          Copy-Item "$tools/fetch-report.json" reports/
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            base-devel
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-binutils
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-zlib
+      - name: Build experimental native-codec FFprobe
+        shell: msys2 {0}
+        run: bash scripts/experimental/build_ffprobe.sh "$FFMPEG_SOURCE" "$CANDIDATE_BUILD" "$CANDIDATE_REPORTS"
+      - name: Compare exact application probes on representative media
+        shell: pwsh
+        run: |
+          $media = Join-Path $env:RUNNER_TEMP 'médias & comparaison #1'
+          python scripts/experimental/compare_probes.py --candidate "$env:CANDIDATE_BUILD/ffprobe-candidate.exe" --baseline "$env:BASELINE_PROBE" --ffmpeg "$env:BASELINE_FFMPEG" --media $media --reports reports
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate comparison failed' }
+      - name: Run original tests with candidate first on PATH
+        shell: pwsh
+        run: |
+          $bin = Join-Path $env:RUNNER_TEMP 'ffprobe-tested-bin'
+          New-Item -ItemType Directory $bin -Force | Out-Null
+          Copy-Item "$env:CANDIDATE_BUILD/ffprobe-candidate.exe" "$bin/ffprobe.exe"
+          $env:PATH = "$bin;$env:PATH"
+          # Run tests against the exact stripped candidate used by the comparison.
+          python -m pytest -q tests/test_engine.py tests/test_network_paths.py tests/test_gui.py tests/test_integration.py --junitxml=reports/candidate-original-tests.xml
+          if ($LASTEXITCODE -ne 0) { throw 'Original tests failed with candidate' }
+      - name: Upload only technical reports, never candidate executable
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Experimental-FFprobe-Windows-evidence
+          path: |
+            reports/*.json
+            reports/*.txt
+            reports/*.log
+            reports/*.map
+            reports/*.h
+            reports/*.mak
+            reports/*.xml
+          if-no-files-found: error
+          retention-days: 30
